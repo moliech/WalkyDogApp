@@ -11,7 +11,7 @@ Esta primera versión establece el esqueleto base y el entorno del sistema:
 2. **Entorno Contenedorizado con Docker (Laravel Sail)**:
    - Configuración de servicios en `compose.yaml`.
    - **Servidor Web (PHP 8.5/Sail)** mapeado en el puerto local **`8060`**.
-   - **Base de Datos MySQL 8.4** mapeada en el puerto local **`3308`** (base de datos: `walkydog`, usuario: `sail`, contraseña: `password`).
+   - **Base de Datos MySQL 8.4** mapeada en el puerto local **`3308`**.
 3. **Controladores Iniciales**:
    - `DashboardController`: Gestión de vistas según el rol de usuario.
    - `MascotaController`: Controladores para el CRUD de mascotas.
