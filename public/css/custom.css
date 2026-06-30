@@ -1,0 +1,283 @@
+/* Custom Styles for WalkyDog 🐾 */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+    --wd-bg: #FDFBF7; /* Warm crema background */
+    --wd-text-dark: #2D3748; /* Charcoal text */
+    --wd-primary: #FF8C32; /* Cozy orange */
+    --wd-primary-hover: #E07A5F;
+    --wd-secondary: #81B29A; /* Sage green */
+    --wd-accent-red: #E05A47; /* Soft SOS red */
+    --wd-card-bg: #FFFFFF;
+    --wd-border: rgba(0, 0, 0, 0.05);
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
+    background-color: var(--wd-bg) !important;
+    color: var(--wd-text-dark) !important;
+}
+
+/* Glassmorphism Navbar */
+.navbar-custom {
+    background-color: rgba(255, 255, 255, 0.85) !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--wd-border) !important;
+    padding: 0.8rem 0 !important;
+    transition: all 0.3s ease;
+}
+
+.navbar-custom .navbar-brand {
+    color: var(--wd-text-dark) !important;
+    font-size: 1.4rem;
+}
+
+.navbar-custom .nav-link {
+    color: #4A5568 !important;
+    font-weight: 600;
+    font-size: 0.95rem;
+    padding: 0.5rem 1rem !important;
+    border-radius: 10px;
+    margin: 0 0.1rem;
+    transition: all 0.2s ease;
+}
+
+.navbar-custom .nav-link:hover {
+    color: var(--wd-primary) !important;
+    background-color: rgba(255, 140, 50, 0.05) !important;
+}
+
+/* Modern Rounded Cards */
+.card {
+    background-color: var(--wd-card-bg) !important;
+    border: 1px solid var(--wd-border) !important;
+    border-radius: 18px !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.015) !important;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease !important;
+    overflow: hidden;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(224, 122, 95, 0.06) !important;
+}
+
+/* Metrics Cards Custom Variations */
+.card-metric {
+    border: none !important;
+    border-radius: 20px !important;
+    background-color: #FFFFFF !important;
+    padding: 1.25rem !important;
+}
+
+.card-metric-primary {
+    border-top: 4px solid var(--wd-primary) !important;
+}
+.card-metric-success {
+    border-top: 4px solid var(--wd-secondary) !important;
+}
+.card-metric-warning {
+    border-top: 4px solid #F39C12 !important;
+}
+.card-metric-danger {
+    border-top: 4px solid var(--wd-accent-red) !important;
+}
+
+.metric-icon-bg {
+    width: 52px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+    font-size: 1.6rem;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.02);
+}
+
+.bg-light-primary { background-color: rgba(255, 140, 50, 0.1) !important; color: var(--wd-primary) !important; }
+.bg-light-success { background-color: rgba(129, 178, 154, 0.15) !important; color: #3d7e5d !important; }
+.bg-light-warning { background-color: rgba(243, 156, 18, 0.1) !important; color: #d35400 !important; }
+.bg-light-danger { background-color: rgba(224, 90, 71, 0.1) !important; color: var(--wd-accent-red) !important; }
+
+/* Custom Buttons */
+.btn-wd-primary {
+    background-color: var(--wd-primary) !important;
+    border: none !important;
+    color: #FFFFFF !important;
+    font-weight: 700 !important;
+    border-radius: 12px !important;
+    padding: 0.65rem 1.4rem !important;
+    box-shadow: 0 4px 12px rgba(255, 140, 50, 0.2) !important;
+    transition: all 0.25s ease !important;
+}
+
+.btn-wd-primary:hover {
+    background-color: var(--wd-primary-hover) !important;
+    box-shadow: 0 6px 16px rgba(224, 122, 95, 0.3) !important;
+    transform: translateY(-1px);
+}
+
+.btn-wd-secondary {
+    background-color: var(--wd-secondary) !important;
+    border: none !important;
+    color: #FFFFFF !important;
+    font-weight: 700 !important;
+    border-radius: 12px !important;
+    padding: 0.65rem 1.4rem !important;
+    box-shadow: 0 4px 12px rgba(129, 178, 154, 0.2) !important;
+    transition: all 0.25s ease !important;
+}
+
+.btn-wd-secondary:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.btn-wd-outline {
+    background-color: transparent !important;
+    border: 2px solid rgba(0,0,0,0.06) !important;
+    color: var(--wd-text-dark) !important;
+    font-weight: 700 !important;
+    border-radius: 12px !important;
+    padding: 0.55rem 1.3rem !important;
+    transition: all 0.2s ease !important;
+}
+
+.btn-wd-outline:hover {
+    border-color: var(--wd-primary) !important;
+    color: var(--wd-primary) !important;
+    background-color: rgba(255, 140, 50, 0.03) !important;
+}
+
+.btn-wd-outline-light {
+    background-color: transparent !important;
+    border: 2px solid rgba(255, 255, 255, 0.4) !important;
+    color: var(--wd-text-dark) !important;
+    font-weight: 700 !important;
+    border-radius: 12px !important;
+    padding: 0.55rem 1.3rem !important;
+    transition: all 0.2s ease !important;
+}
+
+.btn-wd-outline-light:hover {
+    border-color: var(--wd-primary) !important;
+    color: var(--wd-primary) !important;
+    background-color: rgba(255, 140, 50, 0.03) !important;
+}
+
+/* Badges */
+.badge-custom {
+    border-radius: 30px !important;
+    padding: 0.4rem 0.8rem !important;
+    font-weight: 700 !important;
+    font-size: 0.75rem !important;
+    letter-spacing: 0.03em;
+}
+
+.badge-wd-primary { background-color: rgba(255, 140, 50, 0.12) !important; color: var(--wd-primary) !important; }
+.badge-wd-success { background-color: rgba(129, 178, 154, 0.15) !important; color: #3d7e5d !important; }
+.badge-wd-warning { background-color: rgba(243, 156, 18, 0.12) !important; color: #d35400 !important; }
+.badge-wd-danger { background-color: rgba(224, 90, 71, 0.12) !important; color: var(--wd-accent-red) !important; }
+.badge-wd-secondary { background-color: rgba(108, 117, 125, 0.1) !important; color: #495057 !important; }
+
+/* Map Simulado */
+.map-placeholder {
+    background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, rgba(0,0,0,0.02) 100%), url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect fill="none" width="100" height="100"/><path d="M 0,10 L 100,10 M 0,20 L 100,20 M 0,30 L 100,30 M 0,40 L 100,40 M 0,50 L 100,50 M 0,60 L 100,60 M 0,70 L 100,70 M 0,80 L 100,80 M 0,90 L 100,90 M 10,0 L 10,100 M 20,0 L 20,100 M 30,0 L 30,100 M 40,0 L 40,100 M 50,0 L 50,100 M 60,0 L 60,100 M 70,0 L 70,100 M 80,0 L 80,100 M 90,0 L 90,100" stroke="rgba(0,0,0,0.025)" stroke-width="1"/></svg>') !important;
+    background-color: #EBF1F5 !important;
+    border-radius: 20px;
+    position: relative;
+    border: 2px dashed rgba(0,0,0,0.06) !important;
+    box-shadow: inset 0 2px 8px rgba(0,0,0,0.03);
+}
+
+/* Pulse Indicator for Active Walk */
+.pulse-indicator {
+    width: 10px;
+    height: 10px;
+    background-color: #48BB78;
+    border-radius: 50%;
+    display: inline-block;
+    box-shadow: 0 0 0 0 rgba(72, 187, 120, 0.7);
+    animation: pulse 1.6s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(72, 187, 120, 0.7);
+    }
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 8px rgba(72, 187, 120, 0);
+    }
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(72, 187, 120, 0);
+    }
+}
+
+/* Receipt Ticket style for Payment */
+.payment-receipt {
+    background: #FFF;
+    border-radius: 20px;
+    border: 1px solid var(--wd-border);
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.02) !important;
+}
+
+/* Form Styles */
+.form-control, .form-select {
+    border-radius: 12px !important;
+    border: 1px solid rgba(0,0,0,0.08) !important;
+    padding: 0.65rem 1rem !important;
+    font-size: 0.95rem !important;
+    transition: all 0.2s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--wd-primary) !important;
+    box-shadow: 0 0 0 3px rgba(255, 140, 50, 0.15) !important;
+    background-color: #FFF !important;
+}
+
+/* Modals */
+.modal-content {
+    border-radius: 24px !important;
+    border: none !important;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.08) !important;
+    overflow: hidden;
+}
+
+.modal-header {
+    border-bottom: 1px solid var(--wd-border) !important;
+    background-color: #FFFFFF !important;
+    padding: 1.5rem !important;
+}
+
+.modal-body {
+    padding: 1.5rem !important;
+}
+
+/* Pet Card Decorative Header */
+.pet-card-header {
+    background: linear-gradient(135deg, rgba(255, 140, 50, 0.05) 0%, rgba(224, 122, 95, 0.08) 100%);
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3.5rem;
+    border-bottom: 1px solid var(--wd-border);
+}
+
+/* Custom font utilities */
+.font-semibold { font-weight: 600; }
+.font-bold { font-weight: 700; }
+.font-extrabold { font-weight: 800; }
+
+.text-slate {
+    color: #4A5568 !important;
+}
+.text-slate-muted {
+    color: #718096 !important;
+}
