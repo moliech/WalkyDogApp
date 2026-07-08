@@ -5,7 +5,7 @@
 ---
 
 ## 🚀 Estado del Proyecto (Módulo II - Rutas, Vistas y Controladores)
-En esta etapa, el proyecto ha evolucionado incorporando una arquitectura completa de interacción con rutas mapeadas, controladores funcionales con datos simulados (mock) y una interfaz de usuario pulida y responsiva.
+En esta etapa, el proyecto ha evolucionado incorporando una arquitectura de interacción con rutas mapeadas, controladores funcionales con datos simulados (mock) y una interfaz de usuario responsiva maquetada con **Tailwind CSS**.
 
 ### 1. Sistema de Rutas y Navegación
 Se configuraron los siguientes endpoints clave en `routes/web.php`:
@@ -22,27 +22,28 @@ Se implementó lógica de respuesta con matrices de datos simulados:
 * **`MascotaController`**: Retorna un listado de mascotas de prueba (nombre, raza y tamaño).
 * **`PaseoController`**: Provee los datos de geolocalización simulados (latitud, longitud), detalles del paseador y tarifas del servicio.
 
-### 3. Interfaz de Usuario y Estilos (`resources/views/` & `public/css/`)
-* **Diseño Responsivo**: Basado en **Bootstrap 5.3** y estilizado de forma personalizada con **Plus Jakarta Sans** como fuente moderna.
-* **Estilo Personalizado (`custom.css`)**: Implementa una paleta de colores cálidos (cálido crema, carbón, naranja acogedor), tarjetas con esquinas redondeadas y sombras suaves, animaciones de pulso para paseos activos y estilos tipo ticket para el recibo de pago.
-* **Flujos Simulados Interactivos**:
-  - Modal dinámico de **Agendar Paseo** para programar paseos simulados.
-  - Simulación de geolocalización del paseo mediante un marcador visual sobre un mapa interactivo.
-  - Simulación de validación mediante códigos QR y redirección automática hacia la pasarela de pagos.
+### 3. Interfaz de Usuario y Estilos (`resources/views/` & `resources/css/`)
+* **Diseño Responsivo**: Maquetado en su totalidad con **Tailwind CSS v4** e integrado mediante Vite.
+* **Estilo y Tematización**: El archivo `resources/css/app.css` tiene configurados los tokens de marca personalizados (`brand-primary`, `brand-secondary`, `brand-bg`, `brand-dark`).
+* **Interactividad Híbrida**: Se utiliza un puente de compatibilidad mínima para que el JS de Bootstrap controle la interactividad de colapsables y modales (Navbar y "Agendar Paseo") antes de la integración completa con Laravel Breeze.
 
 ---
 
 ## 🛠️ Instrucciones de Ejecución Local
 
-Para levantar el entorno de desarrollo utilizando Docker Sail, sigue estos pasos:
+Para levantar el entorno de desarrollo utilizando Docker Sail y compilar los recursos de Tailwind CSS:
 
 1. **Asegúrate de tener Docker Desktop ejecutándose** en tu máquina.
-2. Abre la terminal en el directorio raíz del proyecto y levanta los contenedores en segundo plano:
+2. Levanta los contenedores en segundo plano:
    ```bash
    ./vendor/bin/sail up -d
    ```
-   *(Si estás ejecutando directamente desde Windows y tienes configurado Docker Compose, puedes usar `docker compose up -d`)*.
-3. Para detener el entorno:
+3. Ejecuta el servidor de desarrollo de Vite para compilar Tailwind CSS en tiempo real:
+   ```bash
+   ./vendor/bin/sail npm run dev
+   ```
+   *(Si estás ejecutando localmente en Windows con Node instalado, puedes correr `npm run dev` en la raíz del proyecto)*.
+4. Para detener los contenedores:
    ```bash
    ./vendor/bin/sail down
    ```

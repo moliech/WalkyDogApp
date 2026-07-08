@@ -2,51 +2,47 @@
 @section('title', 'Simulador de Pago')
 
 @section('content')
-<div class="row justify-content-center py-4">
-    <div class="col-12 col-md-5">
-        <div class="card border-0 shadow-lg payment-receipt">
-            <div class="card-body p-4 text-center">
-                <div class="mb-4">
-                    <span class="fs-1">💳</span>
-                    <h4 class="fw-extrabold text-slate mt-2">Simulador de Pago</h4>
-                    <p class="text-slate-muted small font-semibold">Entorno Seguro de Pruebas Académicas</p>
-                </div>
+<div class="flex justify-center py-8">
+    <div class="w-full max-w-md bg-white p-8 rounded-3xl border border-gray-100 shadow-xl text-center">
+        <div class="mb-6">
+            <span class="text-4xl mb-2 inline-block">💳</span>
+            <h4 class="text-xl font-black text-brand-dark mt-1">Simulador de Pago</h4>
+            <p class="text-xs text-gray-400 font-semibold mt-1">Entorno Seguro de Pruebas Académicas</p>
+        </div>
 
-                <div class="bg-light p-3 rounded-4 text-start mb-4">
-                    <h6 class="fw-extrabold text-slate mb-3 text-center text-uppercase small letter-spacing">Resumen del Servicio</h6>
-                    
-                    <div class="d-flex justify-content-between align-items-center mb-2 small">
-                        <span class="text-slate-muted font-semibold">Referencia:</span>
-                        <span class="text-slate font-bold">#{{ $pagoSimulado['paseo_id'] }}</span>
-                    </div>
-                    
-                    <div class="d-flex justify-content-between align-items-center mb-2 small">
-                        <span class="text-slate-muted font-semibold">Mascota:</span>
-                        <span class="text-slate font-bold">🐶 {{ $pagoSimulado['mascota'] }}</span>
-                    </div>
-                    
-                    <div class="d-flex justify-content-between align-items-center mb-2 small">
-                        <span class="text-slate-muted font-semibold">Duración:</span>
-                        <span class="text-slate font-bold">{{ $pagoSimulado['horas'] }} Horas</span>
-                    </div>
-                    
-                    <hr class="my-3 border-light">
-                    
-                    <div class="d-flex justify-content-between align-items-center fw-bold text-dark">
-                        <span class="text-slate font-extrabold">Total a Pagar:</span>
-                        <span class="fs-5 text-success font-extrabold">${{ number_format($pagoSimulado['total'], 0, ',', '.') }} COP</span>
-                    </div>
-                </div>
-
-                <div class="d-grid gap-2">
-                    <button class="btn btn-wd-secondary p-3 text-uppercase fw-extrabold rounded-4" onclick="alert('Simulación exitosa: Estado cambiado a APPROVED en base de datos.')">
-                        ✅ Autorizar Transacción
-                    </button>
-                    <button class="btn btn-wd-outline text-danger p-2 small border-0 mt-2" onclick="alert('Simulación rechazada: Estado cambiado a REJECTED.')">
-                        Rechazar Pago
-                    </button>
-                </div>
+        <div class="bg-slate-50/80 p-5 rounded-2xl text-left border border-gray-100/50 mb-6 space-y-3.5">
+            <h6 class="text-xs font-extrabold text-gray-400 uppercase tracking-wider text-center pb-3 border-b border-gray-200/50 mb-1">Resumen del Servicio</h6>
+            
+            <div class="flex justify-between items-center text-sm">
+                <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Referencia:</span>
+                <span class="font-mono font-extrabold text-brand-dark">#{{ $pagoSimulado['paseo_id'] }}</span>
             </div>
+            
+            <div class="flex justify-between items-center text-sm">
+                <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Mascota:</span>
+                <span class="font-extrabold text-brand-dark">🐶 {{ $pagoSimulado['mascota'] }}</span>
+            </div>
+            
+            <div class="flex justify-between items-center text-sm">
+                <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Duración:</span>
+                <span class="font-extrabold text-brand-dark">{{ $pagoSimulado['horas'] }} Horas</span>
+            </div>
+            
+            <hr class="border-t border-dashed border-gray-200/80 my-3.5">
+            
+            <div class="flex justify-between items-center">
+                <span class="text-sm font-black text-brand-dark">Total a Pagar:</span>
+                <span class="text-lg font-black text-brand-secondary">${{ number_format($pagoSimulado['total'], 0, ',', '.') }} COP</span>
+            </div>
+        </div>
+
+        <div class="space-y-2">
+            <button class="w-full bg-brand-secondary hover:bg-emerald-600 text-white font-extrabold text-sm py-4 px-6 rounded-2xl shadow-md shadow-brand-secondary/10 hover:shadow-lg hover:shadow-brand-secondary/20 hover:-translate-y-0.5 transition duration-200 cursor-pointer" onclick="alert('Simulación exitosa: Estado cambiado a APPROVED en base de datos.')">
+                ✅ Autorizar Transacción
+            </button>
+            <button class="w-full text-xs font-extrabold text-brand-accent-red hover:underline mt-2 pt-2.5 cursor-pointer" onclick="alert('Simulación rechazada: Estado cambiado a REJECTED.')">
+                Rechazar Pago
+            </button>
         </div>
     </div>
 </div>
