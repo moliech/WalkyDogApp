@@ -2,39 +2,108 @@
 @section('title', 'Panel del Paseador')
 
 @section('content')
-<div class="flex justify-center py-8">
-    <div class="w-full max-w-sm bg-white p-8 rounded-3xl border border-gray-100 shadow-xl text-center">
-        <div class="mb-6">
-            <span class="text-4xl mb-2 inline-block">📱</span>
-            <h4 class="text-xl font-black text-brand-dark mt-1">Panel del Paseador</h4>
-            <span class="text-[10px] font-extrabold uppercase tracking-widest bg-amber-400/10 text-amber-600 px-3 py-1 rounded-full inline-block mt-2">Modo Activo</span>
-        </div>
-        
-        <div class="bg-slate-50/80 p-5 rounded-2xl text-left border border-gray-100/50 mb-6 space-y-4">
-            <div class="text-center pb-3 border-b border-gray-200/50">
-                <span class="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-1">Servicio Asignado</span>
-                <h5 class="text-base font-black text-brand-dark mb-0">Orden #{{ $paseoAsignado['id'] }}</h5>
+<div class="max-w-2xl mx-auto py-4">
+    <div class="mb-6 text-center">
+        <span class="text-4xl mb-2 inline-block">📱</span>
+        <h4 class="text-2xl font-black text-brand-dark mt-1">Panel del Paseador</h4>
+        <p class="text-sm text-gray-400 font-semibold mt-1">Gestiona tus paseos asignados y reporta novedades en tiempo real</p>
+    </div>
+
+    <div class="space-y-6">
+        @forelse($paseosAsignados as $paseo)
+            <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-xl">
+                <div class="flex justify-between items-center pb-4 border-b border-gray-100 mb-4">
+                    <div>
+                        <span class="text-xs font-bold text-gray-400 uppercase tracking-wider block">Servicio Asignado</span>
+                        <h5 class="text-lg font-black text-brand-dark mb-0">Orden #{{ $paseo->id }}</h5>
+                    </div>
+                    <div>
+                        @if($paseo->estado == 'programado')
+                            <span class="text-[10px] font-extrabold uppercase tracking-widest bg-brand-primary/10 text-brand-primary px-3 py-1 rounded-full inline-block">Programado</span>
+                        @else
+                            <span class="text-[10px] font-extrabold uppercase tracking-widest bg-emerald-500/10 text-emerald-600 px-3 py-1 rounded-full inline-block animate-pulse">En Curso</span>
+                        @endif
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 text-sm">
+                    <div class="flex justify-between sm:justify-start sm:gap-6 items-center">
+                        <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Mascota:</span>
+                        <span class="font-extrabold text-brand-dark">🐶 {{ $paseo->mascota->nombre }} ({{ $paseo->mascota->raza }})</span>
+                    </div>
+                    <div class="flex justify-between sm:justify-start sm:gap-6 items-center">
+                        <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Propietario:</span>
+                        <span class="font-extrabold text-brand-dark">{{ $paseo->mascota->propietario->nombres }} {{ $paseo->mascota->propietario->apellidos }}</span>
+                    </div>
+                    <div class="flex justify-between sm:justify-start sm:gap-6 items-center">
+                        <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Contacto:</span>
+                        <span class="font-extrabold text-brand-dark">📞 {{ $paseo->mascota->propietario->telefono ?? 'Sin teléfono' }}</span>
+                    </div>
+                    <div class="flex justify-between sm:justify-start sm:gap-6 items-center">
+                        <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Dirección:</span>
+                        <span class="font-extrabold text-brand-dark">📍 {{ $paseo->mascota->propietario->direccion }}</span>
+                    </div>
+                </div>
+
+                <!-- Botones de Acción -->
+                <div class="flex flex-col sm:flex-row gap-3">
+                    @if($paseo->estado == 'programado')
+                        <form method="POST" action="{{ route('paseos.iniciar', $paseo->id) }}" class="flex-1">
+                            @csrf
+                            <button type="submit" class="w-full bg-brand-primary hover:bg-brand-primary-hover text-white font-extrabold text-sm py-3.5 px-6 rounded-2xl shadow-md hover:shadow-lg transition duration-200 cursor-pointer">
+                                📷 Escanear QR e Iniciar Paseo
+                            </button>
+                        </form>
+                    @else
+                        <form method="POST" action="{{ route('paseos.finalizar', $paseo->id) }}" class="flex-1">
+                            @csrf
+                            <button type="submit" class="w-full bg-brand-accent-red hover:bg-red-600 text-white font-extrabold text-sm py-3.5 px-6 rounded-2xl shadow-md hover:shadow-lg transition duration-200 cursor-pointer">
+                                🛑 Finalizar Recorrido
+                            </button>
+                        </form>
+                        <button class="flex-1 bg-white hover:bg-gray-50 border border-gray-200 text-brand-dark font-extrabold text-sm py-3.5 px-6 rounded-2xl transition duration-200 cursor-pointer" data-bs-toggle="modal" data-bs-target="#novedadModal{{ $paseo->id }}">
+                            🚨 Reportar Novedad
+                        </button>
+                    @endif
+                </div>
             </div>
-            
-            <div class="flex justify-between items-center text-sm">
-                <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Mascota:</span>
-                <span class="font-extrabold text-brand-dark">🐶 {{ $paseoAsignado['mascota'] }}</span>
+
+            <!-- Modal de Novedad para este Paseo -->
+            @if($paseo->estado == 'en_progreso')
+                <div class="modal fade" id="novedadModal{{ $paseo->id }}" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content border-0 shadow-2xl p-2 bg-white">
+                            <div class="modal-header border-0 pb-0 flex justify-between items-center px-6 pt-5">
+                                <h5 class="text-lg font-black text-brand-dark flex items-center gap-2">
+                                    <span>🚨 Reportar Novedad (Paseo #{{ $paseo->id }})</span>
+                                </h5>
+                                <button type="button" class="btn-close focus:outline-none" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body pt-3">
+                                <form method="POST" action="{{ route('novedades.registrar', $paseo->id) }}" class="px-2 pb-4 space-y-4">
+                                    @csrf
+                                    <div>
+                                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">Detalle del incidente o novedad</label>
+                                        <textarea name="detalle" rows="4" placeholder="Ej: Se detuvo a tomar agua, el perro se encuentra cansado, etc..." required class="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 transition duration-200 outline-none text-brand-dark bg-white"></textarea>
+                                    </div>
+                                    <div class="pt-2">
+                                        <button type="submit" class="w-full bg-brand-primary hover:bg-brand-primary-hover text-white font-extrabold text-sm py-3.5 px-6 rounded-xl shadow-md transition duration-200 cursor-pointer">
+                                            Enviar Reporte
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif
+        @empty
+            <div class="bg-white p-12 text-center rounded-3xl border border-gray-100 shadow-xl">
+                <span class="text-4xl">📭</span>
+                <h5 class="text-lg font-bold text-brand-dark mt-4">No tienes paseos programados en este momento</h5>
+                <p class="text-sm text-gray-400 mt-1">Los paseos asignados por los propietarios aparecerán aquí cuando estén aprobados.</p>
             </div>
-            
-            <div class="flex justify-between items-center text-sm">
-                <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Dueño:</span>
-                <span class="font-extrabold text-brand-dark">{{ $paseoAsignado['propietario'] }}</span>
-            </div>
-        </div>
-        
-        <div class="space-y-3">
-            <button class="w-full bg-brand-primary hover:bg-brand-primary-hover text-white font-extrabold text-sm py-4 px-6 rounded-2xl shadow-md shadow-brand-primary/10 hover:shadow-lg hover:shadow-brand-primary/20 hover:-translate-y-0.5 transition duration-200 cursor-pointer" onclick="alert('Iniciando rastreo GPS e interactuando con la cámara para validación QR...')">
-                📷 Escanear QR para Iniciar
-            </button>
-            <button class="w-full border border-gray-100 text-gray-300 font-bold text-sm py-4 px-6 rounded-2xl bg-gray-50/50 cursor-not-allowed" disabled>
-                🛑 Finalizar Servicio
-            </button>
-        </div>
+        @endforelse
     </div>
 </div>
 @endsection

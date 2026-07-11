@@ -15,34 +15,42 @@
             
             <div class="flex justify-between items-center text-sm">
                 <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Referencia:</span>
-                <span class="font-mono font-extrabold text-brand-dark">#{{ $pagoSimulado['paseo_id'] }}</span>
+                <span class="font-mono font-extrabold text-brand-dark">#{{ $paseo->id }}</span>
             </div>
             
             <div class="flex justify-between items-center text-sm">
                 <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Mascota:</span>
-                <span class="font-extrabold text-brand-dark">🐶 {{ $pagoSimulado['mascota'] }}</span>
+                <span class="font-extrabold text-brand-dark">🐶 {{ $paseo->mascota->nombre }}</span>
             </div>
             
             <div class="flex justify-between items-center text-sm">
                 <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Duración:</span>
-                <span class="font-extrabold text-brand-dark">{{ $pagoSimulado['horas'] }} Horas</span>
+                <span class="font-extrabold text-brand-dark">{{ number_format($paseo->pago->monto / 12000, 0) }} Horas</span>
+            </div>
+
+            <div class="flex justify-between items-center text-sm">
+                <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Paseador:</span>
+                <span class="font-extrabold text-brand-dark">🚶 {{ $paseo->paseador->nombres }} {{ $paseo->paseador->apellidos }}</span>
             </div>
             
             <hr class="border-t border-dashed border-gray-200/80 my-3.5">
             
             <div class="flex justify-between items-center">
                 <span class="text-sm font-black text-brand-dark">Total a Pagar:</span>
-                <span class="text-lg font-black text-brand-secondary">${{ number_format($pagoSimulado['total'], 0, ',', '.') }} COP</span>
+                <span class="text-lg font-black text-brand-secondary">${{ number_format($paseo->pago->monto, 0, ',', '.') }} COP</span>
             </div>
         </div>
 
         <div class="space-y-2">
-            <button class="w-full bg-brand-secondary hover:bg-emerald-600 text-white font-extrabold text-sm py-4 px-6 rounded-2xl shadow-md shadow-brand-secondary/10 hover:shadow-lg hover:shadow-brand-secondary/20 hover:-translate-y-0.5 transition duration-200 cursor-pointer" onclick="alert('Simulación exitosa: Estado cambiado a APPROVED en base de datos.')">
-                ✅ Autorizar Transacción
-            </button>
-            <button class="w-full text-xs font-extrabold text-brand-accent-red hover:underline mt-2 pt-2.5 cursor-pointer" onclick="alert('Simulación rechazada: Estado cambiado a REJECTED.')">
-                Rechazar Pago
-            </button>
+            <form method="POST" action="{{ route('pagos.confirmar', $paseo->id) }}">
+                @csrf
+                <button type="submit" class="w-full bg-brand-secondary hover:bg-emerald-600 text-white font-extrabold text-sm py-4 px-6 rounded-2xl shadow-md shadow-brand-secondary/10 hover:shadow-lg hover:shadow-brand-secondary/20 hover:-translate-y-0.5 transition duration-200 cursor-pointer">
+                    ✅ Autorizar Transacción
+                </button>
+            </form>
+            <a href="{{ route('dashboard') }}" class="block text-center text-xs font-extrabold text-brand-accent-red hover:underline mt-2 pt-2.5 cursor-pointer no-underline">
+                Cancelar Pago
+            </a>
         </div>
     </div>
 </div>
