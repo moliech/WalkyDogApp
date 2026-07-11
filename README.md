@@ -1,49 +1,73 @@
 # WalkyDog 🐾
 
-**WalkyDog** es una plataforma web responsiva orientada a la gestión y auditoría del servicio de paseo de perros. Permite que los propietarios monitoreen en tiempo real la ruta de sus mascotas, mientras los paseadores actualizan su posición y certifican el servicio a través de códigos QR.
+**WalkyDog** es una plataforma web responsiva orientada a la gestión y auditoría del servicio de paseo de perros. Permite que los propietarios agenden servicios y monitoreen en tiempo real la ruta de sus mascotas, mientras los paseadores actualizan su posición y registran novedades a través de códigos QR.
 
 ---
 
-## 🚀 Estado del Proyecto (Módulo II - Rutas, Vistas y Controladores)
-En esta etapa, el proyecto ha evolucionado incorporando una arquitectura de interacción con rutas mapeadas, controladores funcionales con datos simulados (mock) y una interfaz de usuario responsiva maquetada con **Tailwind CSS**.
+## 🚀 Estado del Proyecto (Módulo III - ORM Eloquent y Autenticación)
+En esta etapa, el proyecto ha completado su integración con base de datos relacional MySQL usando Eloquent, implementado autenticación segura de usuarios mediante **Laravel Breeze** (Blade stack) y desarrollado 4 flujos dinámicos interactivos de negocio.
 
-### 1. Sistema de Rutas y Navegación
-Se configuraron los siguientes endpoints clave en `routes/web.php`:
-* **Dashboard (`/`)**: Vista principal con estadísticas generales del sistema.
-* **Mis Mascotas (`/mascotas`)**: Listado de mascotas registradas por el usuario.
-* **Monitoreo (`/paseos/monitoreo`)**: Interfaz de seguimiento en tiempo real del paseo activo.
-* **Paseador (`/paseos/control`)**: Panel de control para el paseador con validación del servicio.
-* **Editar Perfil (`/perfil/editar`)**: Formulario con información personal del usuario.
-* **Simulación de Pago (`/pagos/simulacion/{id}`)**: Recibo digital de cobro y simulación de la transacción.
+### 1. Sistema de Autenticación y Perfiles Condicionales (Breeze)
+- **Cuentas y Seguridad**: Registro, inicio de sesión y recuperación de contraseñas 100% en español.
+- **Campos Especializados**: Se adaptó el esquema para registrar `nombres`, `apellidos`, `telefono` y `direccion` de residencia.
+- **Tipos de Cuenta**: Al registrarse, el usuario define si es **Propietario** (para registrar mascotas y agendar paseos) o **Paseador** (quien entra en estado `'pendiente'` hasta ser aprobado por un Administrador).
+- **Control de Vistas por Rol**:
+  * **Propietarios**: Ven *Dashboard*, *Mis Mascotas*, *Monitoreo*, *Historial de Pagos* y el botón *Agendar Paseo*.
+  * **Paseadores**: Ven *Dashboard* y *Paseador* (su agenda).
+  * **Administradores**: Acceso a la sección de **Auditoría** para activar o rechazar postulantes.
 
-### 2. Capa de Controladores (`app/Http/Controllers/`)
-Se implementó lógica de respuesta con matrices de datos simulados:
-* **`DashboardController`**: Retorna métricas clave (paseos activos, mascotas totales, paseadores disponibles) y datos simulados del perfil de usuario.
-* **`MascotaController`**: Retorna un listado de mascotas de prueba (nombre, raza y tamaño).
-* **`PaseoController`**: Provee los datos de geolocalización simulados (latitud, longitud), detalles del paseador y tarifas del servicio.
+### 2. Estructura Relacional (ORM Eloquent)
+Se implementó el esquema físico relacional en la base de datos en la 3ra Forma Normal (3FN):
+- **`User`**: Relación 1:N con `mascotas`, 1:1 con `paseadores_perfiles` y 1:N con `paseos` (como paseador).
+- **`Mascota`**: Pertenece a un propietario y tiene muchos paseos. Cuenta con Scopes Locales de filtrado (`scopeBuscar` y `scopePorTamano`).
+- **`PaseadorPerfil`**: Contiene la documentación de soporte del paseador (cédula, experiencia y estado).
+- **`Paseo`**: Registro central que asocia mascota, paseador, estado del recorrido y token QR.
+- **`Pago`**: Almacena el estado financiero del cobro por horas.
+- **`Ubicacion`**: Historial geográfico de coordenadas para trazar el mapa de ruta.
+- **`Novedad`**: Bitácora de incidentes reportados en el trayecto.
 
-### 3. Interfaz de Usuario y Estilos (`resources/views/` & `resources/css/`)
-* **Diseño Responsivo**: Maquetado en su totalidad con **Tailwind CSS v4** e integrado mediante Vite.
-* **Estilo y Tematización**: El archivo `resources/css/app.css` tiene configurados los tokens de marca personalizados (`brand-primary`, `brand-secondary`, `brand-bg`, `brand-dark`).
-* **Interactividad Híbrida**: Se utiliza un puente de compatibilidad mínima para que el JS de Bootstrap controle la interactividad de colapsables y modales (Navbar y "Agendar Paseo") antes de la integración completa con Laravel Breeze.
+### 3. Los 4 Flujos de Negocio Dinámicos
+* **Agendamiento y Pagos**: El propietario selecciona su mascota y paseador. Se crea el paseo (`'programado'`) y pago (`'pending'`). Al autorizar en la pasarela simulada, el pago cambia a `'approved'`.
+* **Control del Paseador**: Carlos Mendoza ve sus paseos en su agenda. Puede *Iniciar Paseo* (registra hora de inicio y cambia a `'en_progreso'`), reportar *Novedades* escritas, y *Finalizar Recorrido* (estado `'finalizado'`).
+* **Monitoreo en Tiempo Real**: Carga el mapa de **Leaflet.js** y **OpenStreetMap** dibujando la polilínea del recorrido real de la mascota. Cuenta con un selector dinámico arriba si hay más de un paseo activo.
+* **Auditoría de Administrador**: Permite aprobar/rechazar postulaciones de paseadores pendientes para cambiarlos a estado `'activo'`.
+
+---
+
+## 🔑 Credenciales de Prueba (Sembradas en BD)
+
+Para ingresar y probar la plataforma con datos dinámicos, usa las siguientes cuentas:
+
+| Rol | Correo Electrónico | Contraseña | Datos Sembrados |
+| :--- | :--- | :--- | :--- |
+| **Propietario / Admin** | `esteban.molina@cotecnova.edu.co` | `password` | Tiene 3 mascotas: Toby, Luna y Rambo. Un paseo activo de Toby. |
+| **Paseador** | `carlos@demo.com` | `password` | Tiene asignado el paseo activo en curso de Toby. |
 
 ---
 
 ## 🛠️ Instrucciones de Ejecución Local
 
-Para levantar el entorno de desarrollo utilizando Docker Sail y compilar los recursos de Tailwind CSS:
+Para levantar el entorno de desarrollo y poblar la base de datos:
 
 1. **Asegúrate de tener Docker Desktop ejecutándose** en tu máquina.
 2. Levanta los contenedores en segundo plano:
    ```bash
    ./vendor/bin/sail up -d
    ```
-3. Ejecuta el servidor de desarrollo de Vite para compilar Tailwind CSS en tiempo real:
+3. Instala las dependencias y compila los recursos de frontend (Tailwind CSS v4 y fuentes):
+   ```bash
+   ./vendor/bin/sail npm install
+   ./vendor/bin/sail npm run build
+   ```
+4. Ejecuta las migraciones y siembra los datos de prueba iniciales:
+   ```bash
+   ./vendor/bin/sail php artisan migrate:fresh --seed
+   ```
+5. Si deseas ejecutar el servidor de desarrollo de Vite para cambios en vivo:
    ```bash
    ./vendor/bin/sail npm run dev
    ```
-   *(Si estás ejecutando localmente en Windows con Node instalado, puedes correr `npm run dev` en la raíz del proyecto)*.
-4. Para detener los contenedores:
+6. Para detener los contenedores:
    ```bash
    ./vendor/bin/sail down
    ```
