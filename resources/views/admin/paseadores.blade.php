@@ -2,7 +2,7 @@
 @section('title', 'Auditoría de Paseadores')
 
 @section('content')
-<div class="py-6 mb-6 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+<div class="py-6 mb-4 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
     <div>
         <h2 class="text-3xl font-black text-brand-dark tracking-tight">Auditoría de Paseadores 🚶🔍</h2>
         <p class="text-gray-400 font-semibold mt-1">Valida los soportes y documentos de identidad de los paseadores postulados</p>
@@ -10,6 +10,15 @@
     <span class="text-xs font-extrabold px-3 py-1.5 rounded-full bg-brand-primary/10 text-brand-primary uppercase tracking-wider">
         Rol: Administrador
     </span>
+</div>
+
+<div class="flex gap-2 border-b border-gray-100 mb-6">
+    <a href="{{ route('admin.paseadores') }}" class="py-3 px-4 text-sm font-extrabold text-brand-primary border-b-2 border-brand-primary no-underline transition">
+        🚶 Paseadores
+    </a>
+    <a href="{{ route('admin.usuarios') }}" class="py-3 px-4 text-sm font-bold text-gray-400 hover:text-brand-primary no-underline transition">
+        👥 Usuarios Registrados
+    </a>
 </div>
 
 <div class="space-y-12">

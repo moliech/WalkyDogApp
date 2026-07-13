@@ -12,6 +12,10 @@ class MascotaController extends Controller
      */
     public function index(Request $request)
     {
+        if (auth()->check() && auth()->user()->isAdmin()) {
+            abort(403, 'Los administradores no gestionan mascotas propias.');
+        }
+
         // 1. Iniciamos la consulta cargando la relación con el propietario
         $query = Mascota::with('propietario');
 
@@ -40,6 +44,10 @@ class MascotaController extends Controller
      */
     public function create()
     {
+        if (auth()->check() && auth()->user()->isAdmin()) {
+            abort(403, 'Los administradores no gestionan mascotas propias.');
+        }
+
         return view('mascotas.create');
     }
 
@@ -48,6 +56,10 @@ class MascotaController extends Controller
      */
     public function store(Request $request)
     {
+        if (auth()->check() && auth()->user()->isAdmin()) {
+            abort(403, 'Los administradores no gestionan mascotas propias.');
+        }
+
         $request->validate([
             'nombre' => 'required|string|max:100',
             'raza' => 'required|string|max:100',
@@ -72,6 +84,10 @@ class MascotaController extends Controller
      */
     public function edit(Mascota $mascota)
     {
+        if (auth()->check() && auth()->user()->isAdmin()) {
+            abort(403, 'Los administradores no gestionan mascotas propias.');
+        }
+
         // Control de acceso: el propietario debe ser el mismo logueado
         if (auth()->check() && $mascota->propietario_id !== auth()->id()) {
             abort(403, 'No tienes autorización para editar esta mascota.');
@@ -85,6 +101,9 @@ class MascotaController extends Controller
      */
     public function update(Request $request, Mascota $mascota)
     {
+        if (auth()->check() && auth()->user()->isAdmin()) {
+            abort(403, 'Los administradores no gestionan mascotas propias.');
+        }
         if (auth()->check() && $mascota->propietario_id !== auth()->id()) {
             abort(403);
         }
@@ -106,6 +125,9 @@ class MascotaController extends Controller
      */
     public function destroy(Mascota $mascota)
     {
+        if (auth()->check() && auth()->user()->isAdmin()) {
+            abort(403, 'Los administradores no gestionan mascotas propias.');
+        }
         if (auth()->check() && $mascota->propietario_id !== auth()->id()) {
             abort(403);
         }

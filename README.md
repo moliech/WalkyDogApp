@@ -74,8 +74,41 @@ Para levantar el entorno de desarrollo y poblar la base de datos:
 
 ---
 
+## 🔌 API REST (Módulo IV - JWT & Scramble Docs)
+
+El proyecto incluye una API REST securizada con **JSON Web Tokens (JWT)** y documentación interactiva autogenerada mediante **Scramble**.
+
+### 📖 Documentación Interactiva (Swagger UI)
+Una vez levantado el proyecto, puedes ingresar al panel de documentación interactiva para explorar y probar cada uno de los endpoints en:
+👉 **[http://localhost:8060/docs/api](http://localhost:8060/docs/api)**
+
+### 🔐 Seguridad y Autenticación
+Los endpoints protegidos requieren enviar el token JWT en las cabeceras HTTP de la siguiente manera:
+```http
+Authorization: Bearer <tu_token_jwt>
+Accept: application/json
+```
+
+### 🛣️ Endpoints Disponibles
+
+#### 🔑 Autenticación (Auth)
+*   `POST /api/register` - Registro de nuevos clientes.
+*   `POST /api/login` - Inicio de sesión y obtención del token JWT.
+*   `POST /api/logout` - Cierre de sesión e invalidación del token.
+*   `GET /api/me` - Obtención de la información del usuario autenticado (Protegido).
+
+#### 🐾 Gestión de Mascotas (Mascotas CRUD - Protegido)
+*   `GET /api/mascotas` - Listar mascotas (Los clientes ven solo las suyas; el Administrador audita todas).
+*   `POST /api/mascotas` - Registrar una nueva mascota (Exclusivo para clientes).
+*   `GET /api/mascotas/{id}` - Ver detalle de una mascota específica.
+*   `PUT /api/mascotas/{id}` - Actualizar datos de la mascota (Solo propietario).
+*   `DELETE /api/mascotas/{id}` - Eliminar mascota del sistema (Solo propietario).
+
+---
+
 ## 🌐 URLs de Acceso Local
 * **Aplicación Laravel**: [http://localhost:8060](http://localhost:8060)
+* **Documentación API (Scramble)**: [http://localhost:8060/docs/api](http://localhost:8060/docs/api)
 * **Base de Datos MySQL**: Host `localhost` en el puerto `3308`.
 
 ---

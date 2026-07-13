@@ -35,6 +35,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin/paseadores', [App\Http\Controllers\AdminController::class, 'index'])->name('admin.paseadores');
     Route::post('/admin/paseadores/{id}/aprobar', [App\Http\Controllers\AdminController::class, 'aprobar'])->name('admin.paseadores.aprobar');
     Route::post('/admin/paseadores/{id}/rechazar', [App\Http\Controllers\AdminController::class, 'rechazar'])->name('admin.paseadores.rechazar');
+    Route::get('/admin/usuarios', [App\Http\Controllers\AdminController::class, 'usuarios'])->name('admin.usuarios');
 });
 
 // Importamos las rutas de registro y login creadas por Breeze

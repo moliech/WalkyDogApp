@@ -25,7 +25,7 @@ class AppServiceProvider extends ServiceProvider
     {
         // Compartir las mascotas del usuario y los paseadores activos con el layout
         View::composer('layouts.app', function ($view) {
-            if (auth()->check()) {
+            if (auth()->check() && !auth()->user()->isAdmin()) {
                 $view->with('myPets', Mascota::where('propietario_id', auth()->id())->get());
                 $view->with('activeWalkers', User::whereHas('perfilPaseador', function ($query) {
                     $query->where('estado', 'activo');

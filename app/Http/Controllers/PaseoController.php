@@ -17,6 +17,10 @@ class PaseoController extends Controller
      */
     public function monitoreo(Request $request)
     {
+        if (auth()->check() && auth()->user()->isAdmin()) {
+            abort(403, 'Acción no permitida para el rol Administrador.');
+        }
+
         // 1. Obtenemos todos los paseos activos del propietario logueado
         $paseosActivos = Paseo::with(['mascota', 'paseador', 'ubicaciones', 'novedades'])
             ->whereHas('mascota', function ($query) {
@@ -47,6 +51,10 @@ class PaseoController extends Controller
      */
     public function control()
     {
+        if (auth()->check() && auth()->user()->isAdmin()) {
+            abort(403, 'Acción no permitida para el rol Administrador.');
+        }
+
         // Listamos los paseos asignados al paseador logueado en estado 'programado' o 'en_progreso'
         $paseosAsignados = Paseo::with(['mascota.propietario', 'pago'])
             ->where('paseador_id', auth()->id())
@@ -62,6 +70,10 @@ class PaseoController extends Controller
      */
     public function agendar(Request $request)
     {
+        if (auth()->check() && auth()->user()->isAdmin()) {
+            abort(403, 'Acción no permitida para el rol Administrador.');
+        }
+
         $request->validate([
             'mascota_id' => 'required|exists:mascotas,id',
             'paseador_id' => 'required|exists:users,id',
@@ -102,6 +114,10 @@ class PaseoController extends Controller
      */
     public function simularPago($paseo_id)
     {
+        if (auth()->check() && auth()->user()->isAdmin()) {
+            abort(403, 'Acción no permitida para el rol Administrador.');
+        }
+
         $paseo = Paseo::with(['mascota', 'pago', 'paseador'])->findOrFail($paseo_id);
 
         // Validamos que el dueño del paseo sea el usuario logueado
@@ -117,6 +133,10 @@ class PaseoController extends Controller
      */
     public function confirmarPago(Request $request, $paseo_id)
     {
+        if (auth()->check() && auth()->user()->isAdmin()) {
+            abort(403, 'Acción no permitida para el rol Administrador.');
+        }
+
         $paseo = Paseo::with(['mascota', 'pago'])->findOrFail($paseo_id);
 
         if ($paseo->mascota->propietario_id !== auth()->id()) {
@@ -137,6 +157,10 @@ class PaseoController extends Controller
      */
     public function iniciarPaseo($id)
     {
+        if (auth()->check() && auth()->user()->isAdmin()) {
+            abort(403, 'Acción no permitida para el rol Administrador.');
+        }
+
         $paseo = Paseo::findOrFail($id);
 
         // Validamos que el paseador asignado sea el logueado
@@ -166,6 +190,10 @@ class PaseoController extends Controller
      */
     public function finalizarPaseo($id)
     {
+        if (auth()->check() && auth()->user()->isAdmin()) {
+            abort(403, 'Acción no permitida para el rol Administrador.');
+        }
+
         $paseo = Paseo::findOrFail($id);
 
         if ($paseo->paseador_id !== auth()->id()) {
@@ -187,6 +215,10 @@ class PaseoController extends Controller
      */
     public function registrarNovedad(Request $request, $id)
     {
+        if (auth()->check() && auth()->user()->isAdmin()) {
+            abort(403, 'Acción no permitida para el rol Administrador.');
+        }
+
         $paseo = Paseo::findOrFail($id);
 
         if ($paseo->paseador_id !== auth()->id()) {
@@ -211,6 +243,10 @@ class PaseoController extends Controller
      */
     public function historialPagos()
     {
+        if (auth()->check() && auth()->user()->isAdmin()) {
+            abort(403, 'Acción no permitida para el rol Administrador.');
+        }
+
         $paseos = Paseo::with(['mascota', 'paseador', 'pago'])
             ->whereHas('mascota', function ($query) {
                 $query->where('propietario_id', auth()->id());

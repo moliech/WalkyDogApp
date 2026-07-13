@@ -41,8 +41,14 @@ return [
         'web' => [
             'driver' => 'session',
             'provider' => 'users',
-        ],
     ],
+    // 1. AGREGAR ESTE BLOQUE DE RUTA API
+    'api' => [
+        'driver' => 'jwt',
+        'provider' => 'users',
+        'hash' => false,
+    ],
+],
 
     /*
     |--------------------------------------------------------------------------

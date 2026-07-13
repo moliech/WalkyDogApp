@@ -12,9 +12,7 @@ class AdminController extends Controller
      */
     public function index()
     {
-        // Validación básica de administrador: para pruebas, autorizamos a esteban.molina
-        // o a cualquier correo que contenga "admin".
-        if (!auth()->check() || (auth()->user()->email !== 'esteban.molina@cotecnova.edu.co' && !str_contains(auth()->user()->email, 'admin'))) {
+        if (!auth()->check() || !auth()->user()->isAdmin()) {
             abort(403, 'Acceso restringido únicamente para administradores del sistema.');
         }
 
@@ -30,7 +28,7 @@ class AdminController extends Controller
      */
     public function aprobar($id)
     {
-        if (!auth()->check() || (auth()->user()->email !== 'esteban.molina@cotecnova.edu.co' && !str_contains(auth()->user()->email, 'admin'))) {
+        if (!auth()->check() || !auth()->user()->isAdmin()) {
             abort(403);
         }
 
@@ -46,7 +44,7 @@ class AdminController extends Controller
      */
     public function rechazar($id)
     {
-        if (!auth()->check() || (auth()->user()->email !== 'esteban.molina@cotecnova.edu.co' && !str_contains(auth()->user()->email, 'admin'))) {
+        if (!auth()->check() || !auth()->user()->isAdmin()) {
             abort(403);
         }
 
@@ -55,5 +53,25 @@ class AdminController extends Controller
 
         return redirect()->route('admin.paseadores')
             ->with('success', 'Postulación de paseador rechazada.');
+    }
+
+    /**
+     * Listar todos los usuarios clientes registrados.
+     */
+    public function usuarios()
+    {
+        if (!auth()->check() || !auth()->user()->isAdmin()) {
+            abort(403, 'Acceso restringido únicamente para administradores del sistema.');
+        }
+
+        // Obtener usuarios que NO son administradores y NO tienen perfil de paseador
+        $usuarios = \App\Models\User::where('email', '!=', 'esteban.molina@cotecnova.edu.co')
+            ->where('email', 'not like', '%admin%')
+            ->whereDoesntHave('perfilPaseador')
+            ->withCount('mascotas')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('admin.usuarios', compact('usuarios'));
     }
 }

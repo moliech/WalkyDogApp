@@ -10,14 +10,23 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Model;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
 
 #[Fillable(['nombres', 'apellidos', 'email', 'password', 'telefono', 'direccion'])]
 #[Hidden(['password', 'remember_token'])]
-class User extends Authenticatable
+class User extends Authenticatable implements JWTSubject
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
+
+    /**
+     * Determina si el usuario tiene el rol Administrador.
+     */
+    public function isAdmin(): bool
+    {
+        return $this->email === 'esteban.molina@cotecnova.edu.co' || str_contains($this->email, 'admin');
+    }
 
     /**
      * Get the attributes that should be cast.
@@ -48,5 +57,15 @@ class User extends Authenticatable
     public function paseos()
     {
         return $this->hasMany(Paseo::class, 'paseador_id');
+    }
+
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    public function getJWTCustomClaims()
+    {
+        return [];
     }
 }

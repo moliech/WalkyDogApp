@@ -15,7 +15,7 @@ class DashboardController extends Controller
         $user = auth()->user();
         
         // Verificamos si es administrador
-        $esAdmin = $user->email === 'esteban.molina@cotecnova.edu.co' || str_contains($user->email, 'admin');
+        $esAdmin = $user->isAdmin();
 
         if ($esAdmin) {
             // El Administrador ve las métricas y listados globales

@@ -23,21 +23,21 @@
                 <ul class="flex flex-col lg:flex-row items-center lg:ml-auto space-y-3 lg:space-y-0 lg:space-x-1.5 list-none pl-0 mb-0">
                     <li><a class="block text-sm font-bold text-gray-600 hover:text-brand-primary hover:bg-brand-primary/5 px-4 py-2 rounded-xl transition duration-200 no-underline" href="{{ route('dashboard') }}">Dashboard</a></li>
                     
-                    @if(auth()->check() && !auth()->user()->perfilPaseador)
+                    @if(auth()->check() && !auth()->user()->perfilPaseador && !auth()->user()->isAdmin())
                         <li><a class="block text-sm font-bold text-gray-600 hover:text-brand-primary hover:bg-brand-primary/5 px-4 py-2 rounded-xl transition duration-200 no-underline" href="{{ route('mascotas.index') }}">Mis Mascotas</a></li>
                         <li><a class="block text-sm font-bold text-gray-600 hover:text-brand-primary hover:bg-brand-primary/5 px-4 py-2 rounded-xl transition duration-200 no-underline" href="{{ route('paseos.monitoreo') }}">Monitoreo</a></li>
                         <li><a class="block text-sm font-bold text-gray-600 hover:text-brand-primary hover:bg-brand-primary/5 px-4 py-2 rounded-xl transition duration-200 no-underline" href="{{ route('pagos.historial') }}">Historial de Pagos</a></li>
                     @endif
 
-                    @if(auth()->check() && auth()->user()->perfilPaseador)
+                    @if(auth()->check() && auth()->user()->perfilPaseador && !auth()->user()->isAdmin())
                         <li><a class="block text-sm font-bold text-gray-600 hover:text-brand-primary hover:bg-brand-primary/5 px-4 py-2 rounded-xl transition duration-200 no-underline" href="{{ route('paseos.control') }}">Paseador</a></li>
                     @endif
 
-                    @if(auth()->check() && (auth()->user()->email === 'esteban.molina@cotecnova.edu.co' || str_contains(auth()->user()->email, 'admin')))
+                    @if(auth()->check() && auth()->user()->isAdmin())
                         <li><a class="block text-sm font-bold text-brand-secondary hover:text-brand-secondary/80 hover:bg-brand-secondary/5 px-4 py-2 rounded-xl transition duration-200 no-underline" href="{{ route('admin.paseadores') }}">🔍 Auditoría</a></li>
                     @endif
                     
-                    @if(auth()->check() && !auth()->user()->perfilPaseador)
+                    @if(auth()->check() && !auth()->user()->perfilPaseador && !auth()->user()->isAdmin())
                         <li class="w-full lg:w-auto mt-2 lg:mt-0">
                             <button class="w-full lg:w-auto bg-brand-primary hover:bg-brand-primary-hover text-white font-bold text-sm px-5 py-2.5 rounded-xl shadow-sm hover:shadow-lg hover:shadow-brand-primary/20 hover:-translate-y-0.5 transition duration-200 cursor-pointer" data-bs-toggle="modal" data-bs-target="#solicitarPaseoModal">
                                 🐾 Agendar Paseo
