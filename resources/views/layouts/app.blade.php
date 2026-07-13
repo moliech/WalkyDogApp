@@ -21,20 +21,20 @@
             
             <div class="collapse navbar-collapse w-full lg:w-auto lg:flex lg:items-center mt-4 lg:mt-0" id="navbarNav">
                 <ul class="flex flex-col lg:flex-row items-center lg:ml-auto space-y-3 lg:space-y-0 lg:space-x-1.5 list-none pl-0 mb-0">
-                    <li><a class="block text-sm font-bold text-gray-600 hover:text-brand-primary hover:bg-brand-primary/5 px-4 py-2 rounded-xl transition duration-200 no-underline" href="{{ route('dashboard') }}">Dashboard</a></li>
+                    <li><a class="block text-sm font-bold px-4 py-2 rounded-xl transition duration-200 no-underline {{ request()->routeIs('dashboard') ? 'bg-brand-primary/10 text-brand-primary' : 'text-gray-600 hover:text-brand-primary hover:bg-brand-primary/5' }}" href="{{ route('dashboard') }}">Dashboard</a></li>
                     
                     @if(auth()->check() && !auth()->user()->perfilPaseador && !auth()->user()->isAdmin())
-                        <li><a class="block text-sm font-bold text-gray-600 hover:text-brand-primary hover:bg-brand-primary/5 px-4 py-2 rounded-xl transition duration-200 no-underline" href="{{ route('mascotas.index') }}">Mis Mascotas</a></li>
-                        <li><a class="block text-sm font-bold text-gray-600 hover:text-brand-primary hover:bg-brand-primary/5 px-4 py-2 rounded-xl transition duration-200 no-underline" href="{{ route('paseos.monitoreo') }}">Monitoreo</a></li>
-                        <li><a class="block text-sm font-bold text-gray-600 hover:text-brand-primary hover:bg-brand-primary/5 px-4 py-2 rounded-xl transition duration-200 no-underline" href="{{ route('pagos.historial') }}">Historial de Pagos</a></li>
+                        <li><a class="block text-sm font-bold px-4 py-2 rounded-xl transition duration-200 no-underline {{ request()->routeIs('mascotas.*') ? 'bg-brand-primary/10 text-brand-primary' : 'text-gray-600 hover:text-brand-primary hover:bg-brand-primary/5' }}" href="{{ route('mascotas.index') }}">Mis Mascotas</a></li>
+                        <li><a class="block text-sm font-bold px-4 py-2 rounded-xl transition duration-200 no-underline {{ request()->routeIs('paseos.monitoreo') ? 'bg-brand-primary/10 text-brand-primary' : 'text-gray-600 hover:text-brand-primary hover:bg-brand-primary/5' }}" href="{{ route('paseos.monitoreo') }}">Monitoreo</a></li>
+                        <li><a class="block text-sm font-bold px-4 py-2 rounded-xl transition duration-200 no-underline {{ request()->routeIs('pagos.historial') ? 'bg-brand-primary/10 text-brand-primary' : 'text-gray-600 hover:text-brand-primary hover:bg-brand-primary/5' }}" href="{{ route('pagos.historial') }}">Historial de Pagos</a></li>
                     @endif
 
                     @if(auth()->check() && auth()->user()->perfilPaseador && !auth()->user()->isAdmin())
-                        <li><a class="block text-sm font-bold text-gray-600 hover:text-brand-primary hover:bg-brand-primary/5 px-4 py-2 rounded-xl transition duration-200 no-underline" href="{{ route('paseos.control') }}">Paseador</a></li>
+                        <li><a class="block text-sm font-bold px-4 py-2 rounded-xl transition duration-200 no-underline {{ request()->routeIs('paseos.control') ? 'bg-brand-primary/10 text-brand-primary' : 'text-gray-600 hover:text-brand-primary hover:bg-brand-primary/5' }}" href="{{ route('paseos.control') }}">Paseador</a></li>
                     @endif
 
                     @if(auth()->check() && auth()->user()->isAdmin())
-                        <li><a class="block text-sm font-bold text-brand-secondary hover:text-brand-secondary/80 hover:bg-brand-secondary/5 px-4 py-2 rounded-xl transition duration-200 no-underline" href="{{ route('admin.paseadores') }}">🔍 Auditoría</a></li>
+                        <li><a class="block text-sm font-bold px-4 py-2 rounded-xl transition duration-200 no-underline {{ request()->routeIs('admin.paseadores') ? 'bg-brand-secondary/15 text-brand-secondary' : 'text-brand-secondary hover:text-brand-secondary/80 hover:bg-brand-secondary/5' }}" href="{{ route('admin.paseadores') }}">🔍 Auditoría</a></li>
                     @endif
                     
                     @if(auth()->check() && !auth()->user()->perfilPaseador && !auth()->user()->isAdmin())
@@ -45,7 +45,7 @@
                         </li>
                     @endif
                     <li class="w-full lg:w-auto mt-2 lg:mt-0 lg:border-l lg:border-gray-200 lg:pl-3">
-                        <a class="w-full lg:w-auto inline-block text-center border border-gray-200 text-brand-dark hover:border-brand-primary hover:text-brand-primary font-bold text-sm px-5 py-2.5 rounded-xl transition duration-200 no-underline" href="{{ route('perfil.editar') }}">⚙️ Hola, {{ auth()->user()->nombres }}</a>
+                        <a class="w-full lg:w-auto inline-block text-center border font-bold text-sm px-5 py-2.5 rounded-xl transition duration-200 no-underline {{ request()->routeIs('perfil.editar') ? 'bg-brand-primary text-white border-brand-primary shadow-md' : 'border-gray-200 text-brand-dark hover:border-brand-primary hover:text-brand-primary' }}" href="{{ route('perfil.editar') }}">⚙️ Hola, {{ auth()->user()->nombres }}</a>
                     </li>
                                         <li class="w-full lg:w-auto mt-2 lg:mt-0 lg:pl-1">
                         <form method="POST" action="{{ route('logout') }}" class="inline">
