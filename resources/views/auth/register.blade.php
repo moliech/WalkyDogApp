@@ -21,6 +21,13 @@
             <x-input-error :messages="$errors->get('apellidos')" class="mt-2" />
         </div>
 
+        <!-- Nombre de Usuario (Username) -->
+        <div>
+            <x-input-label for="username" :value="__('Nombre de usuario (único)')" />
+            <x-text-input id="username" class="block mt-1 w-full" type="text" name="username" :value="old('username')" required autocomplete="username" />
+            <x-input-error :messages="$errors->get('username')" class="mt-2" />
+        </div>
+
         <!-- Email Address -->
         <div>
             <x-input-label for="email" :value="__('Correo Electrónico')" />
@@ -46,8 +53,8 @@
         <div>
             <x-input-label for="rol" :value="__('Tipo de Cuenta')" />
             <select id="rol" name="rol" required class="block mt-1 w-full rounded-xl border border-gray-200 px-4 py-3 text-sm focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 transition duration-200 outline-none text-brand-dark bg-white">
-                <option value="propietario" {{ old('rol') == 'propietario' ? 'selected' : '' }}>Quiero registrar a mis mascotas 🐶</option>
-                <option value="paseador" {{ old('rol') == 'paseador' ? 'selected' : '' }}>Quiero ser Paseador de Perros 🦮</option>
+                <option value="propietario" {{ old('rol') == 'propietario' ? 'selected' : '' }}>Quiero registrar a mis mascotas</option>
+                <option value="paseador" {{ old('rol') == 'paseador' ? 'selected' : '' }}>Quiero ser Paseador de Perros</option>
             </select>
             <x-input-error :messages="$errors->get('rol')" class="mt-2" />
         </div>

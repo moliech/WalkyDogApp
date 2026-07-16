@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Model;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
 
-#[Fillable(['nombres', 'apellidos', 'email', 'password', 'telefono', 'direccion'])]
+#[Fillable(['nombres', 'apellidos', 'email', 'password', 'telefono', 'direccion', 'username', 'rol'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable implements JWTSubject
 {
@@ -25,7 +25,23 @@ class User extends Authenticatable implements JWTSubject
      */
     public function isAdmin(): bool
     {
-        return $this->email === 'esteban.molina@cotecnova.edu.co' || str_contains($this->email, 'admin');
+        return $this->rol === 'admin';
+    }
+
+    /**
+     * Determina si el usuario tiene el rol Paseador.
+     */
+    public function isPaseador(): bool
+    {
+        return $this->rol === 'paseador';
+    }
+
+    /**
+     * Determina si el usuario tiene el rol Propietario.
+     */
+    public function isPropietario(): bool
+    {
+        return $this->rol === 'propietario';
     }
 
     /**

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('paseador_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('mascota_id')->constrained('mascotas')->onDelete('cascade');
-            $table->enum('estado', ['programado', 'en_progreso', 'finalizado'])->default('programado');
+            $table->enum('estado', ['pendiente', 'esperando_pago', 'programado', 'en_progreso', 'finalizado', 'cancelado'])->default('pendiente');
             $table->string('token_qr', 255)->unique();
             $table->timestamp('hora_inicio')->nullable();
             $table->timestamp('hora_fin')->nullable();

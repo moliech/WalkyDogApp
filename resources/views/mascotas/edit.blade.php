@@ -7,7 +7,7 @@
         <a href="{{ route('mascotas.index') }}" class="text-sm font-bold text-brand-primary hover:text-brand-primary-hover no-underline">
             ← Volver a Mis Mascotas
         </a>
-        <h3 class="text-2xl font-black text-brand-dark mt-2">Editar Datos de {{ $mascota->nombre }} ✏️</h3>
+        <h3 class="text-2xl font-black text-brand-dark mt-2">Editar Datos de {{ $mascota->nombre }}</h3>
         <p class="text-sm text-gray-400 font-semibold">Actualiza la información y observaciones del canino</p>
     </div>
 
@@ -38,9 +38,11 @@
             <div>
                 <label for="tamano" class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">Tamaño estimado</label>
                 <select id="tamano" name="tamano" required class="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 transition duration-200 outline-none text-brand-dark bg-white">
-                    <option value="Pequeño" {{ old('tamano', $mascota->tamano) == 'Pequeño' ? 'selected' : '' }}>Pequeño (Ej: Pug, Chihuahua)</option>
-                    <option value="Mediano" {{ old('tamano', $mascota->tamano) == 'Mediano' ? 'selected' : '' }}>Mediano (Ej: French Poodle, Beagle)</option>
-                    <option value="Grande" {{ old('tamano', $mascota->tamano) == 'Grande' ? 'selected' : '' }}>Grande (Ej: Golden, Pastor Alemán)</option>
+                    @foreach($tamanos as $tam)
+                        <option value="{{ $tam->nombre }}" {{ old('tamano', $mascota->tamano) == $tam->nombre ? 'selected' : '' }}>
+                            {{ $tam->nombre }}
+                        </option>
+                    @endforeach
                 </select>
                 @error('tamano')
                     <span class="text-xs text-brand-accent-red font-bold mt-1 block">{{ $message }}</span>

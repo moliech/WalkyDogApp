@@ -13,23 +13,40 @@ use Illuminate\Support\Str;
 class PaseoController extends Controller
 {
     /**
-     * Monitoreo en tiempo real (Mapa de Leaflet.js para el Propietario)
+     * Monitoreo en tiempo real (Mapa de Leaflet.js para Propietarios, Paseadores y Administradores)
      */
     public function monitoreo(Request $request)
     {
-        if (auth()->check() && auth()->user()->isAdmin()) {
-            abort(403, 'Acción no permitida para el rol Administrador.');
+        /** @var \App\Models\User $user */
+        $user = auth()->user();
+
+        if (!$user) {
+            return redirect()->route('login');
         }
 
-        // 1. Obtenemos todos los paseos activos del propietario logueado
-        $paseosActivos = Paseo::with(['mascota', 'paseador', 'ubicaciones', 'novedades'])
-            ->whereHas('mascota', function ($query) {
-                $query->where('propietario_id', auth()->id());
-            })
-            ->where('estado', 'en_progreso')
-            ->get();
+        // Cargar paseos activos según el rol
+        if ($user->isAdmin()) {
+            // El Administrador ve todos los paseos activos del sistema
+            $paseosActivos = Paseo::with(['mascota', 'paseador', 'ubicaciones', 'novedades'])
+                ->where('estado', 'en_progreso')
+                ->get();
+        } elseif ($user->perfilPaseador) {
+            // El Paseador ve los paseos activos que él está realizando
+            $paseosActivos = Paseo::with(['mascota', 'paseador', 'ubicaciones', 'novedades'])
+                ->where('paseador_id', $user->id)
+                ->where('estado', 'en_progreso')
+                ->get();
+        } else {
+            // El Propietario ve los paseos activos de sus mascotas
+            $paseosActivos = Paseo::with(['mascota', 'paseador', 'ubicaciones', 'novedades'])
+                ->whereHas('mascota', function ($query) use ($user) {
+                    $query->where('propietario_id', $user->id);
+                })
+                ->where('estado', 'en_progreso')
+                ->get();
+        }
 
-        // 2. Determinamos cuál paseo activo mostrar en detalle
+        // Determinamos cuál paseo activo mostrar en detalle en el mapa
         $paseoActivo = null;
         if ($paseosActivos->isNotEmpty()) {
             $selectedId = $request->query('paseo_id');
@@ -37,7 +54,7 @@ class PaseoController extends Controller
                 ? $paseosActivos->firstWhere('id', $selectedId) 
                 : $paseosActivos->first();
 
-            // Si el ID seleccionado no pertenece al usuario, volvemos al primero
+            // Si el ID seleccionado no pertenece al listado autorizado, cargamos el primero
             if (!$paseoActivo) {
                 $paseoActivo = $paseosActivos->first();
             }
@@ -51,14 +68,14 @@ class PaseoController extends Controller
      */
     public function control()
     {
-        if (auth()->check() && auth()->user()->isAdmin()) {
-            abort(403, 'Acción no permitida para el rol Administrador.');
+        if (auth()->check() && !auth()->user()->perfilPaseador) {
+            abort(403, 'Acción exclusiva para paseadores.');
         }
 
-        // Listamos los paseos asignados al paseador logueado en estado 'programado' o 'en_progreso'
+        // Listamos los paseos asignados al paseador logueado
         $paseosAsignados = Paseo::with(['mascota.propietario', 'pago'])
             ->where('paseador_id', auth()->id())
-            ->whereIn('estado', ['programado', 'en_progreso'])
+            ->whereIn('estado', ['pendiente', 'esperando_pago', 'programado', 'en_progreso'])
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -70,8 +87,12 @@ class PaseoController extends Controller
      */
     public function agendar(Request $request)
     {
-        if (auth()->check() && auth()->user()->isAdmin()) {
-            abort(403, 'Acción no permitida para el rol Administrador.');
+        /** @var \App\Models\User $user */
+        $user = auth()->user();
+
+
+        if (auth()->check() && ($user->isAdmin() || auth()->user()->perfilPaseador)) {
+            abort(403, 'Acción exclusiva para propietarios de mascotas.');
         }
 
         $request->validate([
@@ -86,27 +107,30 @@ class PaseoController extends Controller
             abort(403, 'No tienes autorización para agendar un paseo para esta mascota.');
         }
 
-        // 2. Creamos el paseo en estado 'programado'
+        // 2. Creamos el paseo en estado 'pendiente' (Espera de aceptación)
         $paseo = Paseo::create([
             'paseador_id' => $request->paseador_id,
             'mascota_id' => $request->mascota_id,
-            'estado' => 'programado',
+            'estado' => 'pendiente',
             'token_qr' => 'walkydog_qr_' . Str::random(16),
             'hora_inicio' => null,
             'hora_fin' => null,
             'calificacion' => null,
         ]);
 
-        // 3. Generamos el cobro simulado asociado en estado 'pending' (Horas * 12000 COP)
-        $monto = $request->duracion * 12000;
+        // 3. Generamos el cobro simulado asociado en estado 'pending' basado en la tarifa del tamaño
+        $tamanoObj = \App\Models\MascotaTamano::where('nombre', $mascota->tamano)->first();
+        $tarifaPorHora = $tamanoObj ? $tamanoObj->tarifa_por_hora : 12000;
+        $monto = $request->duracion * $tarifaPorHora;
+        
         Pago::create([
             'paseo_id' => $paseo->id,
             'monto' => $monto,
             'estado_pago' => 'pending',
         ]);
 
-        return redirect()->route('pagos.simulacion', $paseo->id)
-            ->with('success', 'Orden de paseo registrada como PENDING. Procede al pago para confirmar el agendamiento.');
+        return redirect()->route('dashboard')
+            ->with('success', '¡Solicitud de paseo registrada! En cuanto el paseador confirme su disponibilidad, podrás proceder al pago.');
     }
 
     /**
@@ -114,8 +138,11 @@ class PaseoController extends Controller
      */
     public function simularPago($paseo_id)
     {
-        if (auth()->check() && auth()->user()->isAdmin()) {
-            abort(403, 'Acción no permitida para el rol Administrador.');
+         /** @var \App\Models\User $user */
+        $user = auth()->user();
+
+        if (auth()->check() && ($user->isAdmin() || auth()->user()->perfilPaseador)) {
+            abort(403, 'Acción exclusiva para propietarios de mascotas.');
         }
 
         $paseo = Paseo::with(['mascota', 'pago', 'paseador'])->findOrFail($paseo_id);
@@ -123,6 +150,10 @@ class PaseoController extends Controller
         // Validamos que el dueño del paseo sea el usuario logueado
         if ($paseo->mascota->propietario_id !== auth()->id()) {
             abort(403);
+        }
+
+        if ($paseo->estado !== 'esperando_pago') {
+            abort(403, 'El paseo no está en espera de pago.');
         }
 
         return view('pagos.simulacion', compact('paseo'));
@@ -133,8 +164,11 @@ class PaseoController extends Controller
      */
     public function confirmarPago(Request $request, $paseo_id)
     {
-        if (auth()->check() && auth()->user()->isAdmin()) {
-            abort(403, 'Acción no permitida para el rol Administrador.');
+         /** @var \App\Models\User $user */
+        $user = auth()->user();
+
+        if (auth()->check() && ($user->isAdmin() || auth()->user()->perfilPaseador)) {
+            abort(403, 'Acción exclusiva para propietarios de mascotas.');
         }
 
         $paseo = Paseo::with(['mascota', 'pago'])->findOrFail($paseo_id);
@@ -143,13 +177,21 @@ class PaseoController extends Controller
             abort(403);
         }
 
-        // Aprobamos el pago
+        if ($paseo->estado !== 'esperando_pago') {
+            abort(403, 'El paseo no está en espera de pago.');
+        }
+
+        // Aprobamos el pago y cambiamos el estado del paseo a 'programado'
         $paseo->pago->update([
             'estado_pago' => 'approved',
         ]);
+        
+        $paseo->update([
+            'estado' => 'programado',
+        ]);
 
         return redirect()->route('dashboard')
-            ->with('success', '¡Pago simulado aprobado con éxito! Tu paseo ha sido agendado y está en espera de ejecución 🐾');
+            ->with('success', '¡Pago simulado aprobado con éxito! Tu paseo ha sido confirmado y está listo para ser ejecutado.');
     }
 
     /**
@@ -157,8 +199,8 @@ class PaseoController extends Controller
      */
     public function iniciarPaseo($id)
     {
-        if (auth()->check() && auth()->user()->isAdmin()) {
-            abort(403, 'Acción no permitida para el rol Administrador.');
+        if (auth()->check() && !auth()->user()->perfilPaseador) {
+            abort(403, 'Acción exclusiva para paseadores.');
         }
 
         $paseo = Paseo::findOrFail($id);
@@ -190,8 +232,8 @@ class PaseoController extends Controller
      */
     public function finalizarPaseo($id)
     {
-        if (auth()->check() && auth()->user()->isAdmin()) {
-            abort(403, 'Acción no permitida para el rol Administrador.');
+        if (auth()->check() && !auth()->user()->perfilPaseador) {
+            abort(403, 'Acción exclusiva para paseadores.');
         }
 
         $paseo = Paseo::findOrFail($id);
@@ -215,8 +257,8 @@ class PaseoController extends Controller
      */
     public function registrarNovedad(Request $request, $id)
     {
-        if (auth()->check() && auth()->user()->isAdmin()) {
-            abort(403, 'Acción no permitida para el rol Administrador.');
+        if (auth()->check() && !auth()->user()->perfilPaseador) {
+            abort(403, 'Acción exclusiva para paseadores.');
         }
 
         $paseo = Paseo::findOrFail($id);
@@ -243,8 +285,11 @@ class PaseoController extends Controller
      */
     public function historialPagos()
     {
-        if (auth()->check() && auth()->user()->isAdmin()) {
-            abort(403, 'Acción no permitida para el rol Administrador.');
+         /** @var \App\Models\User $user */
+        $user = auth()->user();
+
+        if (auth()->check() && ($user->isAdmin() || auth()->user()->perfilPaseador)) {
+            abort(403, 'Acción exclusiva para propietarios de mascotas.');
         }
 
         $paseos = Paseo::with(['mascota', 'paseador', 'pago'])
@@ -256,5 +301,145 @@ class PaseoController extends Controller
             ->get();
 
         return view('pagos.historial', compact('paseos'));
+    }
+
+    /**
+     * Operación del Paseador: Aceptar la solicitud de paseo
+     */
+    public function aceptarPaseo($id)
+    {
+        if (auth()->check() && !auth()->user()->perfilPaseador) {
+            abort(403, 'Acción exclusiva para paseadores.');
+        }
+
+        $paseo = Paseo::findOrFail($id);
+
+        if ($paseo->paseador_id !== auth()->id()) {
+            abort(403);
+        }
+
+        if ($paseo->estado !== 'pendiente') {
+            abort(400, 'El paseo no está en estado pendiente.');
+        }
+
+        $paseo->update([
+            'estado' => 'esperando_pago',
+        ]);
+
+        return redirect()->route('paseos.control')
+            ->with('success', 'Has aceptado la solicitud de paseo. Queda en espera de que el cliente realice el pago.');
+    }
+
+    /**
+     * Operación del Paseador: Rechazar la solicitud de paseo
+     */
+    public function rechazarPaseo($id)
+    {
+        if (auth()->check() && !auth()->user()->perfilPaseador) {
+            abort(403, 'Acción exclusiva para paseadores.');
+        }
+
+        $paseo = Paseo::findOrFail($id);
+
+        if ($paseo->paseador_id !== auth()->id()) {
+            abort(403);
+        }
+
+        if ($paseo->estado !== 'pendiente') {
+            abort(400, 'El paseo no está en estado pendiente.');
+        }
+
+        $paseo->update([
+            'estado' => 'cancelado',
+        ]);
+
+        return redirect()->route('paseos.control')
+            ->with('success', 'Has rechazado la solicitud de paseo.');
+    }
+
+    /**
+     * Operación del Propietario: Calificar un paseo finalizado
+     */
+    public function calificar(Request $request, $id)
+    {
+         /** @var \App\Models\User $user */
+        $user = auth()->user();
+
+        if (auth()->check() && ($user->isAdmin() || auth()->user()->perfilPaseador)) {
+            abort(403, 'Acción exclusiva para propietarios de mascotas.');
+        }
+
+        $request->validate([
+            'calificacion' => 'required|integer|min:1|max:5',
+        ]);
+
+        $paseo = Paseo::with('mascota')->findOrFail($id);
+
+        if ($paseo->mascota->propietario_id !== auth()->id()) {
+            abort(403, 'No tienes autorización para calificar este paseo.');
+        }
+
+        if ($paseo->estado !== 'finalizado') {
+            abort(400, 'Solo puedes calificar paseos finalizados.');
+        }
+
+        $paseo->update([
+            'calificacion' => $request->calificacion,
+        ]);
+
+        // Recalcular la calificación promedio del paseador
+        $perfilPaseador = \App\Models\PaseadorPerfil::where('user_id', $paseo->paseador_id)->first();
+        if ($perfilPaseador) {
+            $promedio = Paseo::where('paseador_id', $paseo->paseador_id)
+                ->where('estado', 'finalizado')
+                ->whereNotNull('calificacion')
+                ->avg('calificacion');
+
+            $perfilPaseador->update([
+                'calificacion_promedio' => round($promedio, 2)
+            ]);
+        }
+
+        return redirect()->route('dashboard')
+            ->with('success', '¡Gracias por calificar el paseo! Tu valoración ayuda a la comunidad.');
+    }
+
+    /**
+     * API POST: Recibe el escaneo del código QR y valida el inicio del paseo.
+     */
+    public function validarQr(Request $request, $id)
+    {
+        $request->validate([
+            'token_qr' => 'required|string',
+        ]);
+
+        $paseo = Paseo::findOrFail($id);
+
+        // Validar que el token escaneado coincida con el generado en la BD
+        if ($paseo->token_qr !== $request->token_qr) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Código QR inválido o expirado. Vuelve a intentarlo.'
+            ], 400);
+        }
+
+        if ($paseo->estado !== 'programado') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Este paseo ya ha sido iniciado o finalizado.'
+            ], 400);
+        }
+
+        // Cambiar estado a en_progreso y registrar hora de inicio
+        $paseo->update([
+            'estado' => 'en_progreso',
+            'hora_inicio' => now(),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => '¡Código QR validado! El paseo ha iniciado correctamente y el rastreo GPS está activo.',
+            'paseo' => $paseo
+        ], 200);
     }
 }

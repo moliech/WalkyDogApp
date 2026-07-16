@@ -4,33 +4,31 @@
 
 ---
 
-## 🚀 Estado del Proyecto (Módulo III - ORM Eloquent y Autenticación)
-En esta etapa, el proyecto ha completado su integración con base de datos relacional MySQL usando Eloquent, implementado autenticación segura de usuarios mediante **Laravel Breeze** (Blade stack) y desarrollado 4 flujos dinámicos interactivos de negocio.
+## 🚀 Estado del Proyecto (Módulo IV - Seguridad y APIs)
+En esta etapa, el proyecto ha completado la implementación del Módulo IV (Seguridad y APIs), incorporando un sistema robusto de control de accesos, estandarización de respuestas API, geolocalización en tiempo real, validación interactiva por QR y consumo defensivo de servicios externos.
 
-### 1. Sistema de Autenticación y Perfiles Condicionales (Breeze)
-- **Cuentas y Seguridad**: Registro, inicio de sesión y recuperación de contraseñas 100% en español.
-- **Campos Especializados**: Se adaptó el esquema para registrar `nombres`, `apellidos`, `telefono` y `direccion` de residencia.
-- **Tipos de Cuenta**: Al registrarse, el usuario define si es **Propietario** (para registrar mascotas y agendar paseos) o **Paseador** (quien entra en estado `'pendiente'` hasta ser aprobado por un Administrador).
-- **Control de Vistas por Rol**:
-  * **Propietarios**: Ven *Dashboard*, *Mis Mascotas*, *Monitoreo*, *Historial de Pagos* y el botón *Agendar Paseo*.
-  * **Paseadores**: Ven *Dashboard* y *Paseador* (su agenda).
-  * **Administradores**: Acceso a la sección de **Auditoría** para activar o rechazar postulantes.
+### 1. Seguridad, Autenticación y Control de Accesos
+- **Roles y Username en la BD:** Modificación de la tabla de usuarios agregando los campos `username` y `rol` (`admin`, `paseador`, `propietario`). Los usuarios existentes fueron poblados con roles de acuerdo a sus perfiles.
+- **Middleware de Roles:** Diseño del middleware `VerificarRol` para restringir el acceso a rutas según el rol asignado, soportando tanto guard web (sesiones) como API (JWT).
+- **Políticas de Acceso:** Uso de `MascotaPolicy` para asegurar que los propietarios solo puedan interactuar con sus mascotas y los administradores puedan auditar todo.
 
-### 2. Estructura Relacional (ORM Eloquent)
-Se implementó el esquema físico relacional en la base de datos en la 3ra Forma Normal (3FN):
-- **`User`**: Relación 1:N con `mascotas`, 1:1 con `paseadores_perfiles` y 1:N con `paseos` (como paseador).
-- **`Mascota`**: Pertenece a un propietario y tiene muchos paseos. Cuenta con Scopes Locales de filtrado (`scopeBuscar` y `scopePorTamano`).
-- **`PaseadorPerfil`**: Contiene la documentación de soporte del paseador (cédula, experiencia y estado).
-- **`Paseo`**: Registro central que asocia mascota, paseador, estado del recorrido y token QR.
-- **`Pago`**: Almacena el estado financiero del cobro por horas.
-- **`Ubicacion`**: Historial geográfico de coordenadas para trazar el mapa de ruta.
-- **`Novedad`**: Bitácora de incidentes reportados en el trayecto.
+### 2. Estandarización de la API de Mascotas (API Resources)
+- **API Resources:** Creación de `MascotaResource` para estructurar y estandarizar las respuestas JSON de la API, ocultando marcas de tiempo internas y formateando la relación con el propietario.
+- **Refactorización de Respuestas:** Adaptación de `Api\MascotaController` para retornar datos utilizando el nuevo recurso en lugar de modelos planos.
 
-### 3. Los 4 Flujos de Negocio Dinámicos
-* **Agendamiento y Pagos**: El propietario selecciona su mascota y paseador. Se crea el paseo (`'programado'`) y pago (`'pending'`). Al autorizar en la pasarela simulada, el pago cambia a `'approved'`.
-* **Control del Paseador**: Carlos Mendoza ve sus paseos en su agenda. Puede *Iniciar Paseo* (registra hora de inicio y cambia a `'en_progreso'`), reportar *Novedades* escritas, y *Finalizar Recorrido* (estado `'finalizado'`).
-* **Monitoreo en Tiempo Real**: Carga el mapa de **Leaflet.js** y **OpenStreetMap** dibujando la polilínea del recorrido real de la mascota. Cuenta con un selector dinámico arriba si hay más de un paseo activo.
-* **Auditoría de Administrador**: Permite aprobar/rechazar postulaciones de paseadores pendientes para cambiarlos a estado `'activo'`.
+### 3. Geolocalización Global en Tiempo Real y Mapas
+- **Historial de Coordenadas:** API REST bajo `/api/paseos/{id}/ubicacion` con control de frecuencia (*throttling*) para guardar coordenadas como máximo cada 15 segundos para no saturar la base de datos.
+- **Seguimiento GPS Global:** Integración en la plantilla base (`layouts/app.blade.php`) de un rastreador en segundo plano que mantiene la pantalla activa (*Screen Wake Lock API*) y continúa transmitiendo las coordenadas del paseador en cualquier pestaña del sitio.
+- **Soporte de Múltiples Paseos:** El script global detecta y transmite la ubicación para todos los paseos activos simultáneamente si el paseador pasea más de un perro a la vez.
+- **Monitoreo Global (Admin):** Panel administrativo con filtro rápido por paseador que permite visualizar en tiempo real en mapas de **Leaflet.js** y **OpenStreetMap** la trayectoria de cualquier mascota activa.
+
+### 4. Validación por Código QR
+- **Generación de Código QR:** El propietario genera un código QR dinámico con el token único de inicio de paseo desde su panel de control.
+- **Escaneo por Cámara:** El paseador activa su cámara móvil para escanear el QR del propietario, lo que valida el token en el backend e inicia el paseo de forma segura.
+
+### 5. Integración de API Externa
+- **Servicio Cliente HTTP:** Creación de `PostService` para realizar llamadas externas con control de timeouts a `jsonplaceholder.typicode.com`.
+- **Diseño Defensivo:** Vista de publicaciones con control de errores que muestra una advertencia en rojo y permite el funcionamiento del sitio si el servidor externo no responde.
 
 ---
 

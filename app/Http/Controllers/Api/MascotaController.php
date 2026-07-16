@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Mascota;
+use App\Http\Resources\MascotaResource;
 
 class MascotaController extends Controller
 {
@@ -25,7 +26,7 @@ class MascotaController extends Controller
             $mascotas = Mascota::where('propietario_id', $user->id)->get();
         }
 
-        return response()->json($mascotas, 200);
+        return response()->json(MascotaResource::collection($mascotas), 200);
     }
 
     /**
@@ -59,7 +60,8 @@ class MascotaController extends Controller
             'observaciones' => $validated['observaciones'] ?? null,
         ]);
 
-        return response()->json($mascota, 201);
+        $mascota->load('propietario');
+        return new MascotaResource($mascota);
     }
 
     /**
@@ -76,7 +78,7 @@ class MascotaController extends Controller
             return response()->json(['error' => 'No autorizado'], 403);
         }
 
-        return response()->json($mascota, 200);
+        return new MascotaResource($mascota);
     }
 
     /**
@@ -101,8 +103,9 @@ class MascotaController extends Controller
         ]);
 
         $mascota->update($validated);
+        $mascota->load('propietario');
 
-        return response()->json($mascota->fresh(), 200);
+        return new MascotaResource($mascota);
     }
 
     /**

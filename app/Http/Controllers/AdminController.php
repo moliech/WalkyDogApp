@@ -74,4 +74,41 @@ class AdminController extends Controller
 
         return view('admin.usuarios', compact('usuarios'));
     }
+
+    /**
+     * Listar y editar tarifas de paseos por tamaño de mascotas.
+     */
+    public function tarifas()
+    {
+        if (!auth()->check() || !auth()->user()->isAdmin()) {
+            abort(403, 'Acceso restringido únicamente para administradores del sistema.');
+        }
+
+        $tarifas = \App\Models\MascotaTamano::all();
+        return view('admin.tarifas', compact('tarifas'));
+    }
+
+    /**
+     * Actualizar tarifas en la base de datos.
+     */
+    public function actualizarTarifas(Request $request)
+    {
+        if (!auth()->check() || !auth()->user()->isAdmin()) {
+            abort(403);
+        }
+
+        $request->validate([
+            'tarifas' => 'required|array',
+            'tarifas.*.id' => 'required|exists:mascota_tamanos,id',
+            'tarifas.*.tarifa_por_hora' => 'required|integer|min:0',
+        ]);
+
+        foreach ($request->tarifas as $tData) {
+            $tamano = \App\Models\MascotaTamano::findOrFail($tData['id']);
+            $tamano->update(['tarifa_por_hora' => $tData['tarifa_por_hora']]);
+        }
+
+        return redirect()->route('admin.tarifas')
+            ->with('success', 'Las tarifas por tamaño han sido actualizadas correctamente.');
+    }
 }

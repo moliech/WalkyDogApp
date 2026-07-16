@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Mascota;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class MascotaController extends Controller
 {
@@ -12,9 +13,7 @@ class MascotaController extends Controller
      */
     public function index(Request $request)
     {
-        if (auth()->check() && auth()->user()->isAdmin()) {
-            abort(403, 'Los administradores no gestionan mascotas propias.');
-        }
+        Gate::authorize('viewAny', Mascota::class);
 
         // 1. Iniciamos la consulta cargando la relación con el propietario
         $query = Mascota::with('propietario');
@@ -35,8 +34,9 @@ class MascotaController extends Controller
 
         // 4. Obtenemos los resultados ordenados
         $mascotas = $query->orderBy('created_at', 'desc')->get();
+        $tamanos = \App\Models\MascotaTamano::all();
 
-        return view('mascotas.index', compact('mascotas'));
+        return view('mascotas.index', compact('mascotas', 'tamanos'));
     }
 
     /**
@@ -44,11 +44,10 @@ class MascotaController extends Controller
      */
     public function create()
     {
-        if (auth()->check() && auth()->user()->isAdmin()) {
-            abort(403, 'Los administradores no gestionan mascotas propias.');
-        }
+        Gate::authorize('create', Mascota::class);
 
-        return view('mascotas.create');
+        $tamanos = \App\Models\MascotaTamano::all();
+        return view('mascotas.create', compact('tamanos'));
     }
 
     /**
@@ -56,14 +55,13 @@ class MascotaController extends Controller
      */
     public function store(Request $request)
     {
-        if (auth()->check() && auth()->user()->isAdmin()) {
-            abort(403, 'Los administradores no gestionan mascotas propias.');
-        }
+        Gate::authorize('create', Mascota::class);
 
+        $tamanosList = \App\Models\MascotaTamano::pluck('nombre')->toArray();
         $request->validate([
             'nombre' => 'required|string|max:100',
             'raza' => 'required|string|max:100',
-            'tamano' => 'required|in:Pequeño,Mediano,Grande',
+            'tamano' => 'required|in:' . implode(',', $tamanosList),
             'observaciones' => 'nullable|string|max:500',
         ]);
 
@@ -84,16 +82,10 @@ class MascotaController extends Controller
      */
     public function edit(Mascota $mascota)
     {
-        if (auth()->check() && auth()->user()->isAdmin()) {
-            abort(403, 'Los administradores no gestionan mascotas propias.');
-        }
+        Gate::authorize('update', $mascota);
 
-        // Control de acceso: el propietario debe ser el mismo logueado
-        if (auth()->check() && $mascota->propietario_id !== auth()->id()) {
-            abort(403, 'No tienes autorización para editar esta mascota.');
-        }
-
-        return view('mascotas.edit', compact('mascota'));
+        $tamanos = \App\Models\MascotaTamano::all();
+        return view('mascotas.edit', compact('mascota', 'tamanos'));
     }
 
     /**
@@ -101,17 +93,13 @@ class MascotaController extends Controller
      */
     public function update(Request $request, Mascota $mascota)
     {
-        if (auth()->check() && auth()->user()->isAdmin()) {
-            abort(403, 'Los administradores no gestionan mascotas propias.');
-        }
-        if (auth()->check() && $mascota->propietario_id !== auth()->id()) {
-            abort(403);
-        }
+        Gate::authorize('update', $mascota);
 
+        $tamanosList = \App\Models\MascotaTamano::pluck('nombre')->toArray();
         $request->validate([
             'nombre' => 'required|string|max:100',
             'raza' => 'required|string|max:100',
-            'tamano' => 'required|in:Pequeño,Mediano,Grande',
+            'tamano' => 'required|in:' . implode(',', $tamanosList),
             'observaciones' => 'nullable|string|max:500',
         ]);
 
@@ -125,12 +113,7 @@ class MascotaController extends Controller
      */
     public function destroy(Mascota $mascota)
     {
-        if (auth()->check() && auth()->user()->isAdmin()) {
-            abort(403, 'Los administradores no gestionan mascotas propias.');
-        }
-        if (auth()->check() && $mascota->propietario_id !== auth()->id()) {
-            abort(403);
-        }
+        Gate::authorize('delete', $mascota);
 
         $mascota->delete();
 

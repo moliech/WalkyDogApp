@@ -12,7 +12,14 @@ class DashboardController extends Controller
 {
     public function index()
     {
+        /** @var \App\Models\User $user */
         $user = auth()->user();
+
+        // Validación defensiva para evitar caídas fatales si expira la sesión
+        if (!$user) {
+            return redirect()->route('login');
+        }
+        
         
         // Verificamos si es administrador
         $esAdmin = $user->isAdmin();
@@ -70,7 +77,7 @@ class DashboardController extends Controller
                 ];
 
                 $paseosActivos = Paseo::with(['mascota', 'paseador'])
-                    ->where('estado', 'en_progreso')
+                    ->whereIn('estado', ['en_progreso', 'programado'])
                     ->whereHas('mascota', function ($q) use ($user) {
                         $q->where('propietario_id', $user->id);
                     })->get();
@@ -83,10 +90,22 @@ class DashboardController extends Controller
                 $novedades = Novedad::whereHas('paseo.mascota', function ($q) use ($user) {
                     $q->where('propietario_id', $user->id);
                 })->with('paseo.mascota')->orderBy('registrado_at', 'desc')->get();
+
+                $paseosPorCalificar = Paseo::with(['mascota', 'paseador'])
+                    ->where('estado', 'finalizado')
+                    ->whereNull('calificacion')
+                    ->whereHas('mascota', function ($q) use ($user) {
+                        $q->where('propietario_id', $user->id);
+                    })->get();
             }
         }
 
-        return view('dashboard', compact('metricas', 'paseosActivos', 'mascotas', 'paseadores', 'novedades'));
+        // Definir colección vacía si no es propietario
+        if (!isset($paseosPorCalificar)) {
+            $paseosPorCalificar = collect();
+        }
+
+        return view('dashboard', compact('metricas', 'paseosActivos', 'mascotas', 'paseadores', 'novedades', 'paseosPorCalificar'));
     }
 
     public function editarPerfil()

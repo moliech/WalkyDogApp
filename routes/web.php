@@ -14,28 +14,41 @@ Route::middleware(['auth'])->group(function () {
     
     // CRUD completo de Mascotas usando recurso (excluye show que no se usa)
     Route::resource('mascotas', MascotaController::class)->except(['show']);
+
+    // --- INTEGRACIÓN DE API EXTERNA ---
+    Route::get('/posts', [App\Http\Controllers\PostController::class, 'index'])->name('posts.index');
     
     // Rutas de paseos y monitoreo
     Route::get('/paseos/monitoreo', [PaseoController::class, 'monitoreo'])->name('paseos.monitoreo');
-    Route::get('/paseos/control', [PaseoController::class, 'control'])->name('paseos.control');
+    Route::post('/paseos/{id}/calificar', [PaseoController::class, 'calificar'])->name('paseos.calificar');
     Route::get('/perfil/editar', [DashboardController::class, 'editarPerfil'])->name('perfil.editar');
-    
+    Route::put('/perfil/actualizar', [App\Http\Controllers\ProfileController::class, 'updateCustom'])->name('perfil.actualizar');
+
     // Agendamiento y pagos
     Route::post('/paseos/agendar', [PaseoController::class, 'agendar'])->name('paseos.agendar');
     Route::get('/pagos/simulacion/{paseo_id}', [PaseoController::class, 'simularPago'])->name('pagos.simulacion');
     Route::post('/pagos/confirmar/{paseo_id}', [PaseoController::class, 'confirmarPago'])->name('pagos.confirmar');
     Route::get('/pagos/historial', [PaseoController::class, 'historialPagos'])->name('pagos.historial');
     
-    // Operaciones del paseador
+    // --- RUTAS OPERATIVAS DEL PASEADOR (Protegidas por rol) ---
+    Route::middleware(['verificar.rol:paseador'])->group(function () {
+    Route::get('/paseos/control', [PaseoController::class, 'control'])->name('paseos.control');
+    Route::post('/paseos/{id}/aceptar', [PaseoController::class, 'aceptarPaseo'])->name('paseos.aceptar');
+    Route::post('/paseos/{id}/rechazar', [PaseoController::class, 'rechazarPaseo'])->name('paseos.rechazar');
     Route::post('/paseos/{id}/iniciar', [PaseoController::class, 'iniciarPaseo'])->name('paseos.iniciar');
     Route::post('/paseos/{id}/finalizar', [PaseoController::class, 'finalizarPaseo'])->name('paseos.finalizar');
     Route::post('/paseos/{id}/novedad', [PaseoController::class, 'registrarNovedad'])->name('novedades.registrar');
+    });
 
-    // Panel de Auditoría del Administrador
+    // --- PANEL DE AUDITORÍA DEL ADMINISTRADOR (Protegidas por rol) ---
+    Route::middleware(['verificar.rol:admin'])->group(function () {
     Route::get('/admin/paseadores', [App\Http\Controllers\AdminController::class, 'index'])->name('admin.paseadores');
     Route::post('/admin/paseadores/{id}/aprobar', [App\Http\Controllers\AdminController::class, 'aprobar'])->name('admin.paseadores.aprobar');
     Route::post('/admin/paseadores/{id}/rechazar', [App\Http\Controllers\AdminController::class, 'rechazar'])->name('admin.paseadores.rechazar');
     Route::get('/admin/usuarios', [App\Http\Controllers\AdminController::class, 'usuarios'])->name('admin.usuarios');
+    Route::get('/admin/tarifas', [App\Http\Controllers\AdminController::class, 'tarifas'])->name('admin.tarifas');
+    Route::post('/admin/tarifas/actualizar', [App\Http\Controllers\AdminController::class, 'actualizarTarifas'])->name('admin.tarifas.actualizar');
+    });
 });
 
 // Importamos las rutas de registro y login creadas por Breeze

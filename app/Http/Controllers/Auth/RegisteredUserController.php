@@ -33,6 +33,7 @@ class RegisteredUserController extends Controller
        $request->validate([
             'nombres' => ['required', 'string', 'max:255'],
             'apellidos' => ['required', 'string', 'max:255'],
+            'username' => ['required', 'string', 'max:255', 'unique:'.User::class],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'telefono' => ['nullable', 'string', 'max:20'],
@@ -43,6 +44,7 @@ class RegisteredUserController extends Controller
         $user = User::create([
             'nombres' => $request->nombres,
             'apellidos' => $request->apellidos,
+            'username' => $request->username,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'telefono' => $request->telefono,
@@ -50,8 +52,13 @@ class RegisteredUserController extends Controller
         ]);
 
         if ($request->rol === 'paseador') {
-            // Nota: Aquí crearemos el perfil más adelante en el Paso 3.
-            // Por ahora, solo guardamos el usuario.
+            \App\Models\PaseadorPerfil::create([
+                'user_id' => $user->id,
+                'identificacion' => 'PENDIENTE',
+                'experiencia_meses' => 0,
+                'calificacion_promedio' => 5.0,
+                'estado' => 'pendiente',
+            ]);
         }
 
         event(new Registered($user));

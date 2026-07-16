@@ -7,7 +7,7 @@
         <a href="{{ route('mascotas.index') }}" class="text-sm font-bold text-brand-primary hover:text-brand-primary-hover no-underline">
             ← Volver a Mis Mascotas
         </a>
-        <h3 class="text-2xl font-black text-brand-dark mt-2">Registrar Nuevo Canino 🐕</h3>
+        <h3 class="text-2xl font-black text-brand-dark mt-2">Registrar Nuevo Canino</h3>
         <p class="text-sm text-gray-400 font-semibold">Completa la información de tu mascota para afiliarla</p>
     </div>
 
@@ -38,9 +38,11 @@
                 <label for="tamano" class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">Tamaño estimado</label>
                 <select id="tamano" name="tamano" required class="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 transition duration-200 outline-none text-brand-dark bg-white">
                     <option value="">Selecciona un tamaño</option>
-                    <option value="Pequeño" {{ old('tamano') == 'Pequeño' ? 'selected' : '' }}>Pequeño (Ej: Pug, Chihuahua)</option>
-                    <option value="Mediano" {{ old('tamano') == 'Mediano' ? 'selected' : '' }}>Mediano (Ej: French Poodle, Beagle)</option>
-                    <option value="Grande" {{ old('tamano') == 'Grande' ? 'selected' : '' }}>Grande (Ej: Golden, Pastor Alemán)</option>
+                    @foreach($tamanos as $tam)
+                        <option value="{{ $tam->nombre }}" {{ old('tamano') == $tam->nombre ? 'selected' : '' }}>
+                            {{ $tam->nombre }}
+                        </option>
+                    @endforeach
                 </select>
                 @error('tamano')
                     <span class="text-xs text-brand-accent-red font-bold mt-1 block">{{ $message }}</span>
@@ -59,7 +61,7 @@
             <!-- Botones -->
             <div class="flex items-center gap-3 pt-4 border-t border-gray-100">
                 <button type="submit" class="flex-1 bg-brand-primary hover:bg-brand-primary-hover text-white font-extrabold text-sm py-3.5 px-6 rounded-xl shadow-md hover:shadow-lg transition duration-200 cursor-pointer">
-                    Registrar Mascota 🐾
+                    Registrar Mascota
                 </button>
                 <a href="{{ route('mascotas.index') }}" class="bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold text-sm py-3.5 px-6 rounded-xl transition duration-200 text-center no-underline">
                     Cancelar

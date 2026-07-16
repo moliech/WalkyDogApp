@@ -5,62 +5,110 @@
 <div class="flex justify-center py-8">
     <div class="w-full max-w-2xl bg-white p-8 rounded-3xl border border-gray-100 shadow-xl">
         <div class="mb-8">
-            <h4 class="text-2xl font-black text-brand-dark">⚙️ Configuración del Perfil</h4>
+            <h4 class="text-2xl font-black text-brand-dark">Configuración del Perfil</h4>
             <p class="text-xs text-gray-400 font-semibold mt-1.5 leading-relaxed">Actualiza tus datos de contacto básicos. La dirección ingresada será el punto de recogida por defecto para los paseadores.</p>
         </div>
         
-        <form class="space-y-6" onsubmit="event.preventDefault(); alert('Estructura de formulario validada. En el Módulo IV conectaremos esta petición PUT/PATCH para actualizar la base de datos MySQL.');">
+        <!-- Mensaje de Éxito de Laravel -->
+        @if(session('success'))
+            <div class="mb-6 p-4 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 rounded-xl text-sm font-semibold">
+                {{ session('success') }}
+            </div>
+        @endif
+
+        <form class="space-y-6" action="{{ route('perfil.actualizar') }}" method="POST" enctype="multipart/form-data">
+            @csrf
+            @method('PUT')
+
+            <!-- Nombres y Apellidos -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="flex flex-col">
-                    <label class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Nombre Completo</label>
-                    <input type="text" class="rounded-xl border border-gray-200 px-4 py-3 text-sm focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 transition duration-200 outline-none text-brand-dark bg-white" value="{{ $usuario['nombre'] }}">
+                    <label class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Nombres</label>
+                    <input type="text" name="nombres" class="rounded-xl border @error('nombres') border-red-500 @else border-gray-200 @enderror px-4 py-3 text-sm focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 transition duration-200 outline-none text-brand-dark bg-white" value="{{ old('nombres', auth()->user()->nombres) }}" required>
+                    @error('nombres')
+                        <span class="text-red-500 text-xs mt-1 font-bold">{{ $message }}</span>
+                    @enderror
                 </div>
                 <div class="flex flex-col">
-                    <label class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Correo Electrónico</label>
-                    <input type="email" class="rounded-xl border border-gray-100 px-4 py-3 text-sm bg-gray-50 text-gray-400 cursor-not-allowed outline-none" value="{{ $usuario['email'] }}" disabled>
+                    <label class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Apellidos</label>
+                    <input type="text" name="apellidos" class="rounded-xl border @error('apellidos') border-red-500 @else border-gray-200 @enderror px-4 py-3 text-sm focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 transition duration-200 outline-none text-brand-dark bg-white" value="{{ old('apellidos', auth()->user()->apellidos) }}" required>
+                    @error('apellidos')
+                        <span class="text-red-500 text-xs mt-1 font-bold">{{ $message }}</span>
+                    @enderror
                 </div>
             </div>
 
+            <!-- Username y Correo Electrónico -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="flex flex-col">
+                    <label class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Nombre de Usuario (Único)</label>
+                    <input type="text" name="username" class="rounded-xl border @error('username') border-red-500 @else border-gray-200 @enderror px-4 py-3 text-sm focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 transition duration-200 outline-none text-brand-dark bg-white" value="{{ old('username', auth()->user()->username) }}" required>
+                    @error('username')
+                        <span class="text-red-500 text-xs mt-1 font-bold">{{ $message }}</span>
+                    @enderror
+                </div>
+                <div class="flex flex-col">
+                    <label class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Correo Electrónico (No modificable)</label>
+                    <input type="email" class="rounded-xl border border-gray-100 px-4 py-3 text-sm bg-gray-50 text-gray-400 cursor-not-allowed outline-none" value="{{ auth()->user()->email }}" disabled>
+                </div>
+            </div>
+
+            <!-- Teléfono y Dirección -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="flex flex-col">
                     <label class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Teléfono de Emergencia</label>
-                    <input type="text" class="rounded-xl border border-gray-200 px-4 py-3 text-sm focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 transition duration-200 outline-none text-brand-dark bg-white" value="{{ $usuario['telefono'] }}">
+                    <input type="text" name="telefono" class="rounded-xl border @error('telefono') border-red-500 @else border-gray-200 @enderror px-4 py-3 text-sm focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 transition duration-200 outline-none text-brand-dark bg-white" value="{{ old('telefono', auth()->user()->telefono) }}">
+                    @error('telefono')
+                        <span class="text-red-500 text-xs mt-1 font-bold">{{ $message }}</span>
+                    @enderror
                 </div>
                 <div class="flex flex-col">
                     <label class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Dirección de Residencia (Cartago)</label>
-                    <input type="text" class="rounded-xl border border-gray-200 px-4 py-3 text-sm focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 transition duration-200 outline-none text-brand-dark bg-white" value="{{ $usuario['direccion'] }}">
+                    <input type="text" name="direccion" class="rounded-xl border @error('direccion') border-red-500 @else border-gray-200 @enderror px-4 py-3 text-sm focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 transition duration-200 outline-none text-brand-dark bg-white" value="{{ old('direccion', auth()->user()->direccion) }}" required>
+                    @error('direccion')
+                        <span class="text-red-500 text-xs mt-1 font-bold">{{ $message }}</span>
+                    @enderror
                 </div>
             </div>
 
             <!-- Campos condicionales para Paseador -->
-            @if($usuario['es_paseador'])
+            @if(auth()->user()->perfilPaseador)
                 <hr class="border-t border-gray-100 my-6">
                 <div class="mb-4">
                     <h5 class="text-sm font-black text-brand-dark flex items-center gap-1.5">
-                        <span>📋 Información del Perfil de Paseador</span>
+                        <span>Información del Perfil de Paseador</span>
                         <span class="text-[10px] font-extrabold uppercase tracking-widest px-2.5 py-0.5 rounded-full 
-                            @if($usuario['estado_paseador'] == 'activo') bg-emerald-500/10 text-emerald-600
-                            @elseif($usuario['estado_paseador'] == 'pendiente') bg-amber-400/10 text-amber-600
+                            @if(auth()->user()->perfilPaseador->estado == 'activo') bg-emerald-500/10 text-emerald-600
+                            @elseif(auth()->user()->perfilPaseador->estado == 'pendiente') bg-amber-400/10 text-amber-600
                             @else bg-red-500/10 text-red-600
                             @endif">
-                            {{ $usuario['estado_paseador'] }}
+                            {{ auth()->user()->perfilPaseador->estado }}
                         </span>
                     </h5>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="flex flex-col">
                         <label class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Identificación (Cédula)</label>
-                        <input type="text" class="rounded-xl border border-gray-200 px-4 py-3 text-sm focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 transition duration-200 outline-none text-brand-dark bg-white" value="{{ $usuario['identificacion'] }}" placeholder="Ej: 1118000000">
+                        <input type="text" name="identificacion" class="rounded-xl border @error('identificacion') border-red-500 @else border-gray-200 @enderror px-4 py-3 text-sm focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 transition duration-200 outline-none text-brand-dark bg-white" value="{{ old('identificacion', auth()->user()->perfilPaseador->identificacion) }}" placeholder="Ej: 1118000000">
+                        @error('identificacion')
+                            <span class="text-red-500 text-xs mt-1 font-bold">{{ $message }}</span>
+                        @enderror
                     </div>
                     <div class="flex flex-col">
                         <label class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Experiencia (Meses)</label>
-                        <input type="number" class="rounded-xl border border-gray-200 px-4 py-3 text-sm focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 transition duration-200 outline-none text-brand-dark bg-white" value="{{ $usuario['experiencia_meses'] }}" placeholder="Ej: 12">
+                        <input type="number" name="experiencia_meses" class="rounded-xl border @error('experiencia_meses') border-red-500 @else border-gray-200 @enderror px-4 py-3 text-sm focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 transition duration-200 outline-none text-brand-dark bg-white" value="{{ old('experiencia_meses', auth()->user()->perfilPaseador->experiencia_meses) }}" placeholder="Ej: 12">
+                        @error('experiencia_meses')
+                            <span class="text-red-500 text-xs mt-1 font-bold">{{ $message }}</span>
+                        @enderror
                     </div>
                 </div>
                 <div class="flex flex-col mt-4">
                     <label class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Documento de Soporte (Identificación/Cédula PDF)</label>
-                    <input type="file" class="rounded-xl border border-gray-200 px-4 py-2 text-sm focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 transition duration-200 outline-none text-brand-dark bg-white">
+                    <input type="file" name="documento_soporte" class="rounded-xl border @error('documento_soporte') border-red-500 @else border-gray-200 @enderror px-4 py-2 text-sm focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 transition duration-200 outline-none text-brand-dark bg-white">
                     <span class="text-[10px] text-gray-400 mt-1 leading-relaxed">Sube tu cédula o carta de experiencia en formato PDF. El Administrador verificará este documento antes de activar tu perfil.</span>
+                    @error('documento_soporte')
+                        <span class="text-red-500 text-xs mt-1 font-bold">{{ $message }}</span>
+                    @enderror
                 </div>
             @endif
 

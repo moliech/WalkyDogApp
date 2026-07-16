@@ -15,6 +15,11 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        // 0. Crear los Tamaños y Tarifas Paramétricas
+        \App\Models\MascotaTamano::create(['nombre' => 'Pequeño', 'tarifa_por_hora' => 10000]);
+        \App\Models\MascotaTamano::create(['nombre' => 'Mediano', 'tarifa_por_hora' => 12000]);
+        \App\Models\MascotaTamano::create(['nombre' => 'Grande', 'tarifa_por_hora' => 15000]);
+
         // 1. Crear tu Usuario Propietario de Prueba
         $propietarioTest = User::create([
             'nombres' => 'Jhon Esteban',

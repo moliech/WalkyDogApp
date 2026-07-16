@@ -11,12 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ubicaciones', function (Blueprint $table) {
+        Schema::create('mascota_tamanos', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('paseo_id')->constrained('paseos')->onDelete('cascade');
-            $table->decimal('latitud', 10, 8);
-            $table->decimal('longitud', 11, 8);
-            $table->timestamp('registrado_at')->useCurrent();
+            $table->string('nombre')->unique();
+            $table->integer('tarifa_por_hora')->default(0);
+            $table->timestamps();
         });
     }
 
@@ -25,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('ubicaciones');
+        Schema::dropIfExists('mascota_tamanos');
     }
 };
