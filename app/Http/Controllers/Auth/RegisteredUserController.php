@@ -54,7 +54,7 @@ class RegisteredUserController extends Controller
         if ($request->rol === 'paseador') {
             \App\Models\PaseadorPerfil::create([
                 'user_id' => $user->id,
-                'identificacion' => 'PENDIENTE',
+                'identificacion' => 'PENDIENTE-' . $user->id,
                 'experiencia_meses' => 0,
                 'calificacion_promedio' => 5.0,
                 'estado' => 'pendiente',
