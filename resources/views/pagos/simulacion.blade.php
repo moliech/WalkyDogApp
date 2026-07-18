@@ -2,6 +2,39 @@
 @section('title', 'Simulador de Pago')
 
 @section('content')
+@php
+    $mascota = $paseo->mascota;
+    $paseador = $paseo->paseador;
+    
+    // Tarifa base por tamaño
+    $tamanoObj = \App\Models\MascotaTamano::where('nombre', $mascota->tamano)->first();
+    $tarifaBase = $tamanoObj ? $tamanoObj->tarifa_por_hora : 12000;
+    
+    // Recargo del paseador
+    $porcentajeRecargo = 0;
+    $recargoMonto = 0;
+    if ($paseador && $paseador->perfilPaseador) {
+        $perfil = $paseador->perfilPaseador;
+        $ajustes = \App\Models\AjusteTarifa::first();
+        $minCalificacion = $ajustes ? $ajustes->calificacion_minima : 4.5;
+        $maxPorcentaje = $ajustes ? $ajustes->porcentaje_maximo : 20;
+        
+        if ($perfil->calificacion_promedio >= $minCalificacion && $perfil->porcentaje_recargo > 0) {
+            $porcentajeRecargo = min($perfil->porcentaje_recargo, $maxPorcentaje);
+            $recargoMonto = ($tarifaBase * $porcentajeRecargo) / 100;
+        }
+    }
+    
+    // Tarifa total por hora
+    $tarifaPorHoraTotal = $tarifaBase + $recargoMonto;
+    
+    // Duración calculada
+    $duracionHoras = 1;
+    if ($tarifaPorHoraTotal > 0) {
+        $duracionHoras = round($paseo->pago->monto / $tarifaPorHoraTotal);
+    }
+@endphp
+
 <div class="flex justify-center py-8">
     <div class="w-full max-w-md bg-white p-8 rounded-3xl border border-gray-100 shadow-xl text-center">
         <div class="mb-6">
@@ -35,7 +68,7 @@
             
             <div class="flex justify-between items-center text-sm">
                 <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Duración:</span>
-                <span class="font-extrabold text-brand-dark">{{ number_format($paseo->pago->monto / 12000, 0) }} Horas</span>
+                <span class="font-extrabold text-brand-dark">{{ $duracionHoras }} Horas</span>
             </div>
 
             <div class="flex justify-between items-center text-sm">
@@ -47,6 +80,18 @@
                     {{ $paseo->paseador->nombres }} {{ $paseo->paseador->apellidos }}
                 </span>
             </div>
+
+            <div class="flex justify-between items-center text-sm">
+                <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Tarifa Base:</span>
+                <span class="font-extrabold text-brand-dark">${{ number_format($tarifaBase, 0, ',', '.') }} COP / hora</span>
+            </div>
+
+            @if($porcentajeRecargo > 0)
+                <div class="flex justify-between items-center text-sm bg-brand-primary/5 p-2 rounded-lg border border-brand-primary/10">
+                    <span class="text-xs font-black text-brand-primary uppercase tracking-wider">Recargo Destacado:</span>
+                    <span class="font-extrabold text-brand-primary">+{{ $porcentajeRecargo }}% (+${{ number_format($recargoMonto, 0, ',', '.') }} COP/h)</span>
+                </div>
+            @endif
             
             <hr class="border-t border-dashed border-gray-200/80 my-3.5">
             
