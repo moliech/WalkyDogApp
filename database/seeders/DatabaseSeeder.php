@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
         \App\Models\MascotaTamano::create(['nombre' => 'Pequeño', 'tarifa_por_hora' => 10000]);
         \App\Models\MascotaTamano::create(['nombre' => 'Mediano', 'tarifa_por_hora' => 12000]);
         \App\Models\MascotaTamano::create(['nombre' => 'Grande', 'tarifa_por_hora' => 15000]);
+        \App\Models\AjusteTarifa::create(['calificacion_minima' => 4.50, 'porcentaje_maximo' => 20]);
 
         // 1. Crear tu Usuario Propietario de Prueba
         $propietarioTest = User::create([

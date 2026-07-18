@@ -130,7 +130,9 @@ class DashboardController extends Controller
             'es_paseador' => $user->perfilPaseador ? true : false,
             'identificacion' => $user->perfilPaseador->identificacion ?? '',
             'experiencia_meses' => $user->perfilPaseador->experiencia_meses ?? '',
-            'estado_paseador' => $user->perfilPaseador->estado ?? ''
+            'estado_paseador' => $user->perfilPaseador->estado ?? '',
+            'calificacion_promedio' => $user->perfilPaseador->calificacion_promedio ?? 5.00,
+            'porcentaje_recargo' => $user->perfilPaseador->porcentaje_recargo ?? 0,
         ];
 
         return view('perfil.editar', compact('usuario'));

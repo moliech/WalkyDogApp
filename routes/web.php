@@ -51,6 +51,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin/usuarios', [App\Http\Controllers\AdminController::class, 'usuarios'])->name('admin.usuarios');
     Route::get('/admin/tarifas', [App\Http\Controllers\AdminController::class, 'tarifas'])->name('admin.tarifas');
     Route::post('/admin/tarifas/actualizar', [App\Http\Controllers\AdminController::class, 'actualizarTarifas'])->name('admin.tarifas.actualizar');
+    Route::get('/admin/pagos', [App\Http\Controllers\AdminController::class, 'historialPagosGlobal'])->name('admin.pagos.historial');
+    Route::get('/admin/pagos/exportar-pdf', [App\Http\Controllers\AdminController::class, 'exportarPdfGlobal'])->name('admin.pagos.exportar-pdf');
     });
 });
 

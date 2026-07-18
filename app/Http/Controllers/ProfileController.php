@@ -78,6 +78,15 @@ class ProfileController extends Controller
             $rules['identificacion'] = ['required', 'string', 'max:20', 'unique:paseadores_perfiles,identificacion,' . $user->perfilPaseador->id];
             $rules['experiencia_meses'] = ['required', 'integer', 'min:0'];
             $rules['documento_soporte'] = ['nullable', 'file', 'mimes:pdf', 'max:2048']; // PDF de máx 2MB
+
+            // Validamos recargo si cumple con el puntaje mínimo de destacados
+            $ajustes = \App\Models\AjusteTarifa::first();
+            $minCalificacion = $ajustes ? $ajustes->calificacion_minima : 4.5;
+            $maxPorcentaje = $ajustes ? $ajustes->porcentaje_maximo : 20;
+
+            if ($user->perfilPaseador->calificacion_promedio >= $minCalificacion) {
+                $rules['porcentaje_recargo'] = ['required', 'integer', 'min:0', 'max:' . $maxPorcentaje];
+            }
         }
         $validated = $request->validate($rules);
 
@@ -111,6 +120,12 @@ class ProfileController extends Controller
                 'identificacion' => $validated['identificacion'],
                 'experiencia_meses' => $validated['experiencia_meses'],
             ];
+
+            if (isset($validated['porcentaje_recargo'])) {
+                $perfilData['porcentaje_recargo'] = $validated['porcentaje_recargo'];
+            } else {
+                $perfilData['porcentaje_recargo'] = 0;
+            }
             // Subir documento de soporte si se cargó un archivo nuevo
             if ($request->hasFile('documento_soporte')) {
                 $file = $request->file('documento_soporte');

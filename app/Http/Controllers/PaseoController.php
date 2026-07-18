@@ -121,10 +121,27 @@ class PaseoController extends Controller
             'calificacion' => null,
         ]);
 
-        // 3. Generamos el cobro simulado asociado en estado 'pending' basado en la tarifa del tamaño
+        // 3. Generamos el cobro simulado asociado en estado 'pending' basado en la tarifa del tamaño y el recargo del paseador
         $tamanoObj = \App\Models\MascotaTamano::where('nombre', $mascota->tamano)->first();
         $tarifaPorHora = $tamanoObj ? $tamanoObj->tarifa_por_hora : 12000;
-        $monto = $request->duracion * $tarifaPorHora;
+
+        // Calcular recargo del paseador destacado si aplica
+        $recargoPaseador = 0;
+        $paseadorUser = User::find($request->paseador_id);
+        if ($paseadorUser && $paseadorUser->perfilPaseador) {
+            $perfil = $paseadorUser->perfilPaseador;
+            $ajustes = \App\Models\AjusteTarifa::first();
+            $minCalificacion = $ajustes ? $ajustes->calificacion_minima : 4.5;
+            $maxPorcentaje = $ajustes ? $ajustes->porcentaje_maximo : 20;
+
+            if ($perfil->calificacion_promedio >= $minCalificacion && $perfil->porcentaje_recargo > 0) {
+                // Capped al máximo permitido por el admin por seguridad
+                $porcentaje = min($perfil->porcentaje_recargo, $maxPorcentaje);
+                $recargoPaseador = ($tarifaPorHora * $porcentaje) / 100;
+            }
+        }
+
+        $monto = $request->duracion * ($tarifaPorHora + $recargoPaseador);
         
         Pago::create([
             'paseo_id' => $paseo->id,

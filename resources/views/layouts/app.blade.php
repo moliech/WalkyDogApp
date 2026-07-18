@@ -52,6 +52,14 @@
                                 Tarifas
                             </a>
                         </li>
+                        <li>
+                            <a class="block text-sm font-bold px-4 py-2 rounded-xl transition duration-200 no-underline {{ request()->routeIs('admin.pagos.historial') ? 'bg-brand-secondary/15 text-brand-secondary' : 'text-brand-secondary hover:text-brand-secondary/80 hover:bg-brand-secondary/5' }}" href="{{ route('admin.pagos.historial') }}">
+                                <svg class="w-4 h-4 inline-block mr-1 align-text-bottom" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-6.188 3.197L1.125 19.5V4.5h21.75V19.5l-2.188-1.053a2.25 2.25 0 0 0-2.074 0l-2.188 1.053a2.25 2.25 0 0 1-2.074 0l-2.188-1.053a2.25 2.25 0 0 0-2.074 0L8.25 19.5l-2.188-1.053a2.25 2.25 0 0 0-2.074 0l-2.188 1.053a2.25 2.25 0 0 1-2.074 0Z"/>
+                                </svg>
+                                Pagos Global
+                            </a>
+                        </li>
                     @endif
                     
                     @if(auth()->check() && !auth()->user()->perfilPaseador && !auth()->user()->isAdmin())

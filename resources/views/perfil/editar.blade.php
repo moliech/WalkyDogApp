@@ -134,6 +134,39 @@
                         <span class="text-red-500 text-xs mt-1 font-bold">{{ $message }}</span>
                     @enderror
                 </div>
+
+                @php
+                    $ajustes = \App\Models\AjusteTarifa::first();
+                    $minCalificacion = $ajustes ? $ajustes->calificacion_minima : 4.5;
+                    $maxPorcentaje = $ajustes ? $ajustes->porcentaje_maximo : 20;
+                    $calificaRecargo = $usuario['calificacion_promedio'] >= $minCalificacion;
+                @endphp
+
+                <div class="mt-6 p-5 rounded-2xl border transition duration-200 @if($calificaRecargo) bg-brand-primary/5 border-brand-primary/10 @else bg-slate-50 border-slate-100 @endif">
+                    <h6 class="text-xs font-black text-brand-dark uppercase tracking-wider mb-1">Beneficio de Tarifa Destacada</h6>
+                    @if($calificaRecargo)
+                        <p class="text-xs text-gray-500 font-semibold mb-4 leading-relaxed">
+                            ¡Felicitaciones! Cumples con el puntaje promedio mínimo de **{{ number_format($minCalificacion, 2) }}** (Tu calificación promedio es **{{ number_format($usuario['calificacion_promedio'], 2) }} ★**). Puedes configurar un recargo adicional sobre la tarifa por hora de los paseos.
+                        </p>
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div class="flex-1">
+                                <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Porcentaje de Recargo Adicional</label>
+                                <span class="text-[10px] text-gray-400 font-semibold leading-relaxed block">Puedes definir entre 0% y un máximo de {{ $maxPorcentaje }}%</span>
+                            </div>
+                            <div class="w-36 flex items-center bg-white border border-gray-200 rounded-xl px-3 py-2 focus-within:border-brand-primary transition">
+                                <input type="number" name="porcentaje_recargo" value="{{ old('porcentaje_recargo', $usuario['porcentaje_recargo']) }}" required min="0" max="{{ $maxPorcentaje }}" class="w-full text-right text-sm font-black text-brand-dark outline-none border-0 p-0 focus:ring-0">
+                                <span class="text-xs font-extrabold text-gray-400 ml-1.5">%</span>
+                            </div>
+                        </div>
+                        @error('porcentaje_recargo')
+                            <span class="text-red-500 text-xs mt-1 font-bold block">{{ $message }}</span>
+                        @enderror
+                    @else
+                        <p class="text-xs text-gray-400 font-semibold leading-relaxed">
+                            Para desbloquear el cobro de recargos adicionales, requieres una calificación promedio mínima de **{{ number_format($minCalificacion, 2) }} ★**. Actualmente tu promedio de calificación es de **{{ number_format($usuario['calificacion_promedio'], 2) }} ★**. ¡Sigue brindando un excelente servicio para habilitar este beneficio!
+                        </p>
+                    @endif
+                </div>
             @endif
 
             <div class="flex justify-end gap-3 pt-6 border-t border-gray-100">
