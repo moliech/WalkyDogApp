@@ -18,10 +18,10 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction
 # Etapa 3: Servidor PHP de producción (PHP 8.3 requerido por WalkyDog)
 FROM php:8.3-fpm-alpine
 
-# Instalar dependencias del sistema y soporte para MySQL y GD (requerido para DomPDF)
-RUN apk add --no-cache nginx mysql-client libpng-dev libjpeg-turbo-dev freetype-dev
+# Instalar dependencias del sistema y soporte para MySQL, PostgreSQL y GD (requerido para DomPDF)
+RUN apk add --no-cache nginx postgresql-dev mysql-client libpng-dev libjpeg-turbo-dev freetype-dev
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install pdo pdo_mysql gd
+    && docker-php-ext-install pdo pdo_mysql pdo_pgsql gd
 
 WORKDIR /var/www/html
 COPY . .
