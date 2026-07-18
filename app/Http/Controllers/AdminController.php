@@ -106,6 +106,12 @@ class AdminController extends Controller
             abort(403);
         }
 
+        if ($request->has('calificacion_minima')) {
+            $request->merge([
+                'calificacion_minima' => str_replace(',', '.', $request->calificacion_minima)
+            ]);
+        }
+
         $request->validate([
             'tarifas' => 'required|array',
             'tarifas.*.id' => 'required|exists:mascota_tamanos,id',

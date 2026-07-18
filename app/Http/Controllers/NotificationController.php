@@ -29,4 +29,29 @@ class NotificationController extends Controller
         
         return back()->with('success', 'Todas las notificaciones fueron marcadas como leídas.');
     }
+
+    /**
+     * Obtiene las notificaciones no leídas en formato JSON para el polling en tiempo real.
+     */
+    public function getUnread()
+    {
+        if (!auth()->check()) {
+            return response()->json(['count' => 0, 'notifications' => []]);
+        }
+
+        $notifications = auth()->user()->unreadNotifications;
+
+        return response()->json([
+            'count' => $notifications->count(),
+            'notifications' => $notifications->map(function ($n) {
+                return [
+                    'id' => $n->id,
+                    'mensaje' => $n->data['mensaje'],
+                    'tipo' => $n->data['tipo'],
+                    'url' => route('notificaciones.ir', $n->id),
+                    'time' => $n->created_at->diffForHumans()
+                ];
+            })
+        ]);
+    }
 }

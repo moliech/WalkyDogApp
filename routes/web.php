@@ -32,6 +32,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/paseos/exportar-pdf', [PaseoController::class, 'exportarPdf'])->name('paseos.exportar-pdf');
     Route::get('/notificaciones/{id}/ir', [\App\Http\Controllers\NotificationController::class, 'readAndRedirect'])->name('notificaciones.ir');
     Route::post('/notificaciones/marcar-leidas', [\App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('notificaciones.marcar-leidas');
+    Route::get('/api/notificaciones/unread', [\App\Http\Controllers\NotificationController::class, 'getUnread'])->name('api.notificaciones.unread');
     
     // --- RUTAS OPERATIVAS DEL PASEADOR (Protegidas por rol) ---
     Route::middleware(['verificar.rol:paseador'])->group(function () {

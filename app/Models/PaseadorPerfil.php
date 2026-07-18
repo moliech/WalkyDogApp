@@ -13,7 +13,8 @@ class PaseadorPerfil extends Model
 
     protected $fillable = [
         'user_id', 'identificacion', 'experiencia_meses', 
-        'calificacion_promedio', 'estado', 'documento_soporte'
+        'calificacion_promedio', 'estado', 'documento_soporte',
+        'porcentaje_recargo'
     ];
 
     // Relación: El perfil pertenece a un usuario (User)

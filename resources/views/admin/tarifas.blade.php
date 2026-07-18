@@ -52,7 +52,7 @@
                     <div class="flex flex-col p-4 rounded-2xl bg-slate-50 border border-slate-100">
                         <label class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Calificación Mínima Requerida</label>
                         <div class="flex items-center bg-white border border-gray-200 rounded-xl px-3 py-2 focus-within:border-brand-primary transition">
-                            <input type="number" name="calificacion_minima" value="{{ old('calificacion_minima', $ajustes->calificacion_minima) }}" required min="0" max="5" step="0.1" class="w-full text-left text-sm font-black text-brand-dark outline-none border-0 p-0 focus:ring-0">
+                            <input type="text" name="calificacion_minima" value="{{ old('calificacion_minima', $ajustes->calificacion_minima) }}" required class="w-full text-left text-sm font-black text-brand-dark outline-none border-0 p-0 focus:ring-0" oninput="this.value = this.value.replace(/,/g, '.').replace(/[^0-9.]/g, '')">
                             <span class="text-xs font-bold text-gray-400 ml-1.5 uppercase">★</span>
                         </div>
                         <span class="text-[10px] text-gray-400 font-semibold mt-1">Puntaje promedio mínimo para acceder al beneficio</span>

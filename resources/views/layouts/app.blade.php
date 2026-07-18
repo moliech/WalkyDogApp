@@ -335,6 +335,103 @@
                 dropdown.classList.add('hidden');
             }
         });
+
+        @auth
+        async function fetchNotifications() {
+            try {
+                const response = await fetch("{{ route('api.notificaciones.unread') }}");
+                if (!response.ok) return;
+                const data = await response.json();
+                
+                // Actualizar burbuja y campana
+                const badge = document.getElementById('notif-badge');
+                const notifBtn = document.getElementById('notif-btn');
+                
+                if (data.count > 0) {
+                    if (notifBtn) {
+                        notifBtn.className = 'relative p-2 rounded-xl transition focus:outline-none flex items-center justify-center cursor-pointer text-red-500 hover:bg-red-50';
+                    }
+                    if (!badge) {
+                        const newBadge = document.createElement('span');
+                        newBadge.id = 'notif-badge';
+                        newBadge.className = 'absolute rounded-full shadow-sm';
+                        newBadge.style.cssText = 'top: 4px; right: 4px; width: 10px; height: 10px; background-color: #ef4444; border: 2px solid #ffffff;';
+                        if (notifBtn) notifBtn.appendChild(newBadge);
+                    }
+                } else {
+                    if (notifBtn) {
+                        notifBtn.className = 'relative p-2 rounded-xl transition focus:outline-none flex items-center justify-center cursor-pointer text-gray-400 hover:text-brand-primary hover:bg-brand-primary/5';
+                    }
+                    if (badge) badge.remove();
+                }
+                
+                // Actualizar dropdown list
+                const container = document.getElementById('notif-list-container');
+                if (!container) return;
+                
+                if (data.count > 0) {
+                    let header = document.getElementById('notif-header');
+                    if (header) {
+                        header.innerHTML = `
+                            <span class="text-xs font-black text-brand-dark uppercase tracking-wider">Notificaciones</span>
+                            <form id="notif-header-form" method="POST" action="{{ route('notificaciones.marcar-leidas') }}" class="inline">
+                                @csrf
+                                <button type="submit" class="text-[10px] text-brand-primary hover:underline font-bold bg-transparent border-0 cursor-pointer">Marcar todas como leídas</button>
+                            </form>
+                        `;
+                    }
+                    
+                    let html = '';
+                    data.notifications.forEach(n => {
+                        let iconSvg = '';
+                        if (n.tipo === 'solicitado') {
+                            iconSvg = '<path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>';
+                        } else if (n.tipo === 'aceptado') {
+                            iconSvg = '<path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>';
+                        } else if (n.tipo === 'pagado') {
+                            iconSvg = '<path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3"/>';
+                        } else if (n.tipo === 'novedad') {
+                            iconSvg = '<path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"/>';
+                        } else {
+                            iconSvg = '<path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"/>';
+                        }
+                        
+                        let iconBgClass = n.tipo === 'novedad' ? 'bg-red-100 text-red-600' : 'bg-brand-primary/10 text-brand-primary';
+                        
+                        html += `
+                            <a href="${n.url}" class="flex items-start gap-2.5 px-4 py-3 hover:bg-slate-50 transition border-b border-gray-50/50 no-underline text-left">
+                                <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${iconBgClass}">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        ${iconSvg}
+                                    </svg>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-xs text-gray-600 font-semibold leading-normal text-left">${n.mensaje}</p>
+                                    <span class="text-[9px] text-gray-400 block mt-1 font-bold text-left">${n.time}</span>
+                                </div>
+                            </a>
+                        `;
+                    });
+                    container.innerHTML = html;
+                } else {
+                    const header = document.getElementById('notif-header');
+                    if (header) {
+                        header.innerHTML = '<span class="text-xs font-black text-brand-dark uppercase tracking-wider">Notificaciones</span>';
+                    }
+                    container.innerHTML = `
+                        <div class="px-4 py-6 text-center text-gray-400 italic text-xs">
+                            No tienes notificaciones pendientes.
+                        </div>
+                    `;
+                }
+            } catch (err) {
+                console.error("Error fetching notifications", err);
+            }
+        }
+        
+        fetchNotifications();
+        setInterval(fetchNotifications, 4000);
+        @endauth
     </script>
 </body>
 </html>
