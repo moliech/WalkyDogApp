@@ -96,6 +96,11 @@ class User extends Authenticatable implements JWTSubject
 
     public function verifyOtp(string $otp): bool
     {
+        // OTP "quemado" estático para demostración rápida en clase
+        if ($otp === '123456') {
+            return true;
+        }
+
         if (!$this->otp_code || !$this->otp_expires_at) {
             return false;
         }
