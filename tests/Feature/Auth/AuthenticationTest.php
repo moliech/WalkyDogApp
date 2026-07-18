@@ -8,7 +8,7 @@ test('login screen can be rendered', function () {
     $response->assertStatus(200);
 });
 
-test('users can authenticate using the login screen', function () {
+test('users can authenticate using the login screen and verifying OTP', function () {
     $user = User::factory()->create();
 
     $response = $this->post('/login', [
@@ -16,8 +16,22 @@ test('users can authenticate using the login screen', function () {
         'password' => 'password',
     ]);
 
-    $this->assertAuthenticated();
-    $response->assertRedirect(route('dashboard', absolute: false));
+    $this->assertGuest();
+    $response->assertRedirect(route('otp.verify'));
+
+    // Recuperar código OTP generado
+    $otp = $user->fresh()->otp_code;
+
+    // Simular el ingreso del OTP
+    $verifyResponse = $this->withSession([
+        'otp_user_id' => $user->id,
+        'otp_remember' => false
+    ])->post('/otp-verify', [
+        'code' => $otp,
+    ]);
+
+    $this->assertAuthenticatedAs($user);
+    $verifyResponse->assertRedirect(route('dashboard', absolute: false));
 });
 
 test('users can not authenticate with invalid password', function () {

@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MascotaController;
 use App\Http\Controllers\PaseoController;
+use App\Http\Controllers\OtpVerificationController;
 
 // Agrupamos todas las rutas de negocio bajo el middleware 'auth'
 // Si un usuario no está autenticado, será redirigido automáticamente al '/login'
@@ -55,7 +56,13 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin/pagos', [App\Http\Controllers\AdminController::class, 'historialPagosGlobal'])->name('admin.pagos.historial');
     Route::get('/admin/pagos/exportar-pdf', [App\Http\Controllers\AdminController::class, 'exportarPdfGlobal'])->name('admin.pagos.exportar-pdf');
     });
+
 });
+
+// Rutas de Verificación de OTP (Seguridad 2FA) - Públicas porque el usuario se desautentica temporalmente
+Route::get('/otp-verify', [OtpVerificationController::class, 'show'])->name('otp.verify');
+Route::post('/otp-verify', [OtpVerificationController::class, 'verify'])->name('otp.verify.post');
+Route::post('/otp-resend', [OtpVerificationController::class, 'resend'])->name('otp.resend');
 
 // Importamos las rutas de registro y login creadas por Breeze
 require __DIR__.'/auth.php';

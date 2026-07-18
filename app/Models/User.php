@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Model;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
 
-#[Fillable(['nombres', 'apellidos', 'email', 'password', 'telefono', 'direccion', 'username', 'rol', 'avatar'])]
+#[Fillable(['nombres', 'apellidos', 'email', 'password', 'telefono', 'direccion', 'username', 'rol', 'avatar', 'otp_code', 'otp_expires_at'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable implements JWTSubject
 {
@@ -83,5 +83,25 @@ class User extends Authenticatable implements JWTSubject
     public function getJWTCustomClaims()
     {
         return [];
+    }
+
+    public function generateOtp(): string
+    {
+        $otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+        $this->otp_code = $otp;
+        $this->otp_expires_at = now()->addMinutes(5);
+        $this->save();
+        return $otp;
+    }
+
+    public function verifyOtp(string $otp): bool
+    {
+        if (!$this->otp_code || !$this->otp_expires_at) {
+            return false;
+        }
+        if (now()->gt($this->otp_expires_at)) {
+            return false;
+        }
+        return hash_equals($this->otp_code, $otp);
     }
 }
