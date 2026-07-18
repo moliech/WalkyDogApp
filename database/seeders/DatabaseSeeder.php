@@ -29,6 +29,8 @@ class DatabaseSeeder extends Seeder
             'password' => bcrypt('password'), // La contraseña de prueba será 'password'
             'telefono' => '3123456789',
             'direccion' => 'Calle 10 # 4-50, Cartago, Valle',
+            'username' => 'esteban.molina',
+            'rol' => 'admin',
         ]);
 
         // 2. Crear las Mascotas para tu usuario de prueba
@@ -64,6 +66,8 @@ class DatabaseSeeder extends Seeder
             'password' => bcrypt('password'),
             'telefono' => '3219876543',
             'direccion' => 'Carrera 5 # 12-30, Cartago, Valle',
+            'username' => 'carlos.mendoza',
+            'rol' => 'paseador',
         ]);
 
         PaseadorPerfil::create([
