@@ -16,7 +16,7 @@ class MascotaController extends Controller
     public function index()
     {
         /** @var \App\Models\User $user */
-        $user = auth('api')->user();
+        $user = auth()->user();
 
         if ($user->isAdmin()) {
             // El Administrador audita todas las mascotas registradas en el sistema
@@ -35,7 +35,7 @@ class MascotaController extends Controller
     public function store(Request $request)
     {
         /** @var \App\Models\User $user */
-        $user = auth('api')->user();
+        $user = auth()->user();
 
         // Bloqueo: El Administrador no puede registrar mascotas propias
         if ($user->isAdmin()) {
@@ -70,7 +70,7 @@ class MascotaController extends Controller
     public function show(string $id)
     {
         /** @var \App\Models\User $user */
-        $user = auth('api')->user();
+        $user = auth()->user();
         $mascota = Mascota::with('propietario')->findOrFail($id);
 
         // Seguridad: El usuario debe ser el propietario o administrador
@@ -87,7 +87,7 @@ class MascotaController extends Controller
     public function update(Request $request, string $id)
     {
         /** @var \App\Models\User $user */
-        $user = auth('api')->user();
+        $user = auth()->user();
         $mascota = Mascota::findOrFail($id);
 
         // Bloqueo: El Admin no puede modificar mascotas, y un cliente solo las propias
@@ -114,7 +114,7 @@ class MascotaController extends Controller
     public function destroy(string $id)
     {
         /** @var \App\Models\User $user */
-        $user = auth('api')->user();
+        $user = auth()->user();
         $mascota = Mascota::findOrFail($id);
 
         // Bloqueo: El Admin no puede borrar mascotas, y un cliente solo las propias
