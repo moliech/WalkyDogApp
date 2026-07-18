@@ -7,8 +7,11 @@ use App\Models\Pago;
 use App\Models\Novedad;
 use App\Models\Ubicacion;
 use App\Models\Mascota;
+use App\Models\User;
+use App\Notifications\PaseoNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class PaseoController extends Controller
 {
@@ -129,6 +132,17 @@ class PaseoController extends Controller
             'estado_pago' => 'pending',
         ]);
 
+        // Notificar al paseador en pantalla
+        $paseadorUser = User::find($request->paseador_id);
+        if ($paseadorUser) {
+            $paseadorUser->notify(new PaseoNotification(
+                $paseo,
+                "Tienes una nueva solicitud de paseo para {$mascota->nombre}.",
+                'solicitado',
+                route('paseos.control', [], false)
+            ));
+        }
+
         return redirect()->route('dashboard')
             ->with('success', '¡Solicitud de paseo registrada! En cuanto el paseador confirme su disponibilidad, podrás proceder al pago.');
     }
@@ -190,6 +204,17 @@ class PaseoController extends Controller
             'estado' => 'programado',
         ]);
 
+        // Notificar al paseador en pantalla
+        $paseadorUser = User::find($paseo->paseador_id);
+        if ($paseadorUser) {
+            $paseadorUser->notify(new PaseoNotification(
+                $paseo,
+                "El paseo solicitado para {$paseo->mascota->nombre} ha sido pagado y está programado.",
+                'pagado',
+                route('paseos.control', [], false)
+            ));
+        }
+
         return redirect()->route('dashboard')
             ->with('success', '¡Pago simulado aprobado con éxito! Tu paseo ha sido confirmado y está listo para ser ejecutado.');
     }
@@ -223,6 +248,21 @@ class PaseoController extends Controller
             'longitud' => -75.9122,
         ]);
 
+        // Despachamos el evento de alerta de correo electrónico
+        $paseo->load(['mascota.propietario', 'paseador']);
+        event(new \App\Events\PaseoIniciado($paseo));
+
+        // Notificar al propietario en pantalla
+        $propietarioUser = $paseo->mascota->propietario;
+        if ($propietarioUser) {
+            $propietarioUser->notify(new PaseoNotification(
+                $paseo,
+                "¡Tu mascota {$paseo->mascota->nombre} ha iniciado su paseo! Sigue el monitoreo en vivo.",
+                'iniciado',
+                route('paseos.monitoreo', [], false)
+            ));
+        }
+
         return redirect()->route('paseos.control')
             ->with('success', '¡Paseo iniciado con éxito! Tu geolocalización se transmitirá en segundo plano.');
     }
@@ -247,6 +287,18 @@ class PaseoController extends Controller
             'estado' => 'finalizado',
             'hora_fin' => now(),
         ]);
+
+        // Notificar al propietario en pantalla
+        $paseo->load(['mascota.propietario', 'paseador']);
+        $propietarioUser = $paseo->mascota->propietario;
+        if ($propietarioUser) {
+            $propietarioUser->notify(new PaseoNotification(
+                $paseo,
+                "El paseo de {$paseo->mascota->nombre} ha finalizado. Por favor, califica al paseador.",
+                'finalizado',
+                route('dashboard', [], false)
+            ));
+        }
 
         return redirect()->route('paseos.control')
             ->with('success', 'Paseo finalizado correctamente. Gracias por cuidar de nuestra mascota 🐾');
@@ -276,6 +328,18 @@ class PaseoController extends Controller
             'detalle' => $request->detalle,
         ]);
 
+        // Notificar al propietario en pantalla
+        $paseo->load('mascota.propietario');
+        $propietarioUser = $paseo->mascota->propietario;
+        if ($propietarioUser) {
+            $propietarioUser->notify(new PaseoNotification(
+                $paseo,
+                "Se ha registrado una novedad en el paseo de {$paseo->mascota->nombre}: {$request->detalle}",
+                'novedad',
+                route('paseos.monitoreo', [], false)
+            ));
+        }
+
         return redirect()->route('paseos.control')
             ->with('success', 'Novedad registrada e inyectada al propietario en tiempo real.');
     }
@@ -283,7 +347,7 @@ class PaseoController extends Controller
     /**
      * Historial de pagos para el Propietario
      */
-    public function historialPagos()
+    public function historialPagos(Request $request)
     {
          /** @var \App\Models\User $user */
         $user = auth()->user();
@@ -292,15 +356,53 @@ class PaseoController extends Controller
             abort(403, 'Acción exclusiva para propietarios de mascotas.');
         }
 
-        $paseos = Paseo::with(['mascota', 'paseador', 'pago'])
-            ->whereHas('mascota', function ($query) {
-                $query->where('propietario_id', auth()->id());
+        $query = Paseo::with(['mascota', 'paseador', 'pago'])
+            ->whereHas('mascota', function ($q) {
+                $q->where('propietario_id', auth()->id());
             })
-            ->whereHas('pago')
-            ->orderBy('created_at', 'desc')
-            ->get();
+            ->whereHas('pago');
+
+        // Aplicamos los scopes locales de filtrado
+        $query->buscarMascota($request->get('buscar'))
+              ->filtrarEstado($request->get('estado'))
+              ->rangoFechas($request->get('fecha_inicio'), $request->get('fecha_fin'));
+
+        $paseos = $query->orderBy('created_at', 'desc')
+            ->paginate(10)
+            ->appends($request->query());
 
         return view('pagos.historial', compact('paseos'));
+    }
+
+    /**
+     * Exportar historial de pagos / paseos a PDF
+     */
+    public function exportarPdf(Request $request)
+    {
+         /** @var \App\Models\User $user */
+        $user = auth()->user();
+
+        if (auth()->check() && ($user->isAdmin() || auth()->user()->perfilPaseador)) {
+            abort(403, 'Acción exclusiva para propietarios de mascotas.');
+        }
+
+        $query = Paseo::with(['mascota', 'paseador', 'pago'])
+            ->whereHas('mascota', function ($q) {
+                $q->where('propietario_id', auth()->id());
+            })
+            ->whereHas('pago');
+
+        // Replicamos la misma lógica de filtros
+        $query->buscarMascota($request->get('buscar'))
+              ->filtrarEstado($request->get('estado'))
+              ->rangoFechas($request->get('fecha_inicio'), $request->get('fecha_fin'));
+
+        $paseos = $query->orderBy('created_at', 'desc')->get();
+
+        $pdf = Pdf::loadView('pdf.historial-paseos', compact('paseos'))
+                  ->setPaper('letter', 'portrait');
+
+        return $pdf->download('reporte-paseos-' . now()->format('Y-m-d') . '.pdf');
     }
 
     /**
@@ -325,6 +427,18 @@ class PaseoController extends Controller
         $paseo->update([
             'estado' => 'esperando_pago',
         ]);
+
+        // Notificar al propietario en pantalla
+        $paseo->load(['mascota.propietario', 'paseador']);
+        $propietarioUser = $paseo->mascota->propietario;
+        if ($propietarioUser) {
+            $propietarioUser->notify(new PaseoNotification(
+                $paseo,
+                "Tu solicitud de paseo para {$paseo->mascota->nombre} ha sido aceptada por {$paseo->paseador->nombres}. Ya puedes realizar el pago.",
+                'aceptado',
+                route('pagos.simulacion', ['paseo_id' => $paseo->id], false)
+            ));
+        }
 
         return redirect()->route('paseos.control')
             ->with('success', 'Has aceptado la solicitud de paseo. Queda en espera de que el cliente realice el pago.');

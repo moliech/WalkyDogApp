@@ -165,24 +165,9 @@
             <div id="map" class="m-4 rounded-xl border border-gray-100 shadow-inner"></div>
         </div>
     </div>
-@else
-    <div class="bg-white p-12 text-center rounded-3xl border border-gray-100 shadow-xl max-w-lg mx-auto mt-12">
-        <svg class="w-12 h-12 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"/>
-        </svg>
-        <h4 class="text-xl font-black text-brand-dark mt-4">No tienes paseos activos en curso</h4>
-        <p class="text-sm text-gray-400 mt-2 leading-relaxed">
-            Cuando tu paseador asignado inicie el recorrido escaneando el código QR de tu mascota, podrás ver su ubicación satelital e incidentes en este panel.
-        </p>
-        @if(auth()->check() && !auth()->user()->isAdmin() && !auth()->user()->perfilPaseador)
-        <button class="mt-6 bg-brand-primary hover:bg-brand-primary-hover text-white font-extrabold text-sm px-6 py-3 rounded-xl shadow-sm hover:shadow-lg cursor-pointer" data-bs-toggle="modal" data-bs-target="#solicitarPaseoModal">
-            Agendar un Paseo
-        </button>
-        @endif
-    </div>
 
     <!-- Modal de Novedad para el Paseador (Monitoreo) -->
-    @if($paseoActivo && auth()->check() && auth()->user()->perfilPaseador && $paseoActivo->estado == 'en_progreso')
+    @if(auth()->check() && auth()->user()->perfilPaseador && $paseoActivo->estado == 'en_progreso')
         <div class="modal fade" id="novedadModal{{ $paseoActivo->id }}" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content border-0 shadow-2xl p-2 bg-white rounded-3xl">
@@ -213,6 +198,21 @@
             </div>
         </div>
     @endif
+@else
+    <div class="bg-white p-12 text-center rounded-3xl border border-gray-100 shadow-xl max-w-lg mx-auto mt-12">
+        <svg class="w-12 h-12 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"/>
+        </svg>
+        <h4 class="text-xl font-black text-brand-dark mt-4">No tienes paseos activos en curso</h4>
+        <p class="text-sm text-gray-400 mt-2 leading-relaxed">
+            Cuando tu paseador asignado inicie el recorrido escaneando el código QR de tu mascota, podrás ver su ubicación satelital e incidentes en este panel.
+        </p>
+        @if(auth()->check() && !auth()->user()->isAdmin() && !auth()->user()->perfilPaseador)
+        <button class="mt-6 bg-brand-primary hover:bg-brand-primary-hover text-white font-extrabold text-sm px-6 py-3 rounded-xl shadow-sm hover:shadow-lg cursor-pointer" data-bs-toggle="modal" data-bs-target="#solicitarPaseoModal">
+            Agendar un Paseo
+        </button>
+        @endif
+    </div>
 @endif
 @endsection
 

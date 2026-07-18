@@ -332,5 +332,6 @@
             statusEl.classList.add('text-red-600', 'font-extrabold');
         }
     });
+</script>
 
 @endsection

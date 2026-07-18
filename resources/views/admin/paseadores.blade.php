@@ -67,6 +67,19 @@
                                 <span class="font-bold uppercase tracking-wider text-gray-400">Dirección:</span>
                                 <span class="font-bold text-brand-dark">{{ $perfil->user->direccion }}</span>
                             </div>
+                            <div class="flex justify-between items-center pt-2">
+                                <span class="font-bold uppercase tracking-wider text-gray-400">Documento:</span>
+                                @if($perfil->documento_soporte)
+                                    <a href="{{ asset('storage/' . $perfil->documento_soporte) }}" target="_blank" class="text-brand-primary hover:text-brand-primary-hover font-bold flex items-center gap-1">
+                                        <svg class="w-4 h-4 text-brand-primary inline-block" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/>
+                                        </svg>
+                                        Ver PDF de Soporte
+                                    </a>
+                                @else
+                                    <span class="text-gray-400 italic">No cargado</span>
+                                @endif
+                            </div>
                         </div>
                     </div>
 
@@ -111,6 +124,7 @@
                         <th class="p-4 font-bold text-gray-400 uppercase tracking-wider text-xs">Cédula</th>
                         <th class="p-4 font-bold text-gray-400 uppercase tracking-wider text-xs">Experiencia</th>
                         <th class="p-4 font-bold text-gray-400 uppercase tracking-wider text-xs">Calificación</th>
+                        <th class="p-4 font-bold text-gray-400 uppercase tracking-wider text-xs">Soporte</th>
                         <th class="p-4 font-bold text-gray-400 uppercase tracking-wider text-xs">Acción</th>
                     </tr>
                 </thead>
@@ -130,6 +144,18 @@
                                 {{ number_format($perfil->calificacion_promedio, 1) }}
                             </td>
                             <td class="p-4">
+                                @if($perfil->documento_soporte)
+                                    <a href="{{ asset('storage/' . $perfil->documento_soporte) }}" target="_blank" class="text-xs font-bold text-brand-primary hover:underline flex items-center gap-1">
+                                        <svg class="w-4 h-4 text-brand-primary inline-block" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/>
+                                        </svg>
+                                        Ver PDF
+                                    </a>
+                                @else
+                                    <span class="text-xs text-gray-400 italic">No cargado</span>
+                                @endif
+                            </td>
+                            <td class="p-4">
                                 <form method="POST" action="{{ route('admin.paseadores.rechazar', $perfil->id) }}">
                                     @csrf
                                     <button type="submit" class="text-xs font-bold text-brand-accent-red hover:underline bg-transparent border-0 cursor-pointer">
@@ -140,7 +166,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="p-8 text-center text-gray-400 italic">No hay paseadores aprobados en el sistema.</td>
+                            <td colspan="6" class="p-8 text-center text-gray-400 italic">No hay paseadores aprobados en el sistema.</td>
                         </tr>
                     @endforelse
                 </tbody>

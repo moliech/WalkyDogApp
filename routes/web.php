@@ -29,6 +29,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/pagos/simulacion/{paseo_id}', [PaseoController::class, 'simularPago'])->name('pagos.simulacion');
     Route::post('/pagos/confirmar/{paseo_id}', [PaseoController::class, 'confirmarPago'])->name('pagos.confirmar');
     Route::get('/pagos/historial', [PaseoController::class, 'historialPagos'])->name('pagos.historial');
+    Route::get('/paseos/exportar-pdf', [PaseoController::class, 'exportarPdf'])->name('paseos.exportar-pdf');
+    Route::get('/notificaciones/{id}/ir', [\App\Http\Controllers\NotificationController::class, 'readAndRedirect'])->name('notificaciones.ir');
+    Route::post('/notificaciones/marcar-leidas', [\App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('notificaciones.marcar-leidas');
     
     // --- RUTAS OPERATIVAS DEL PASEADOR (Protegidas por rol) ---
     Route::middleware(['verificar.rol:paseador'])->group(function () {

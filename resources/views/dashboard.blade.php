@@ -49,6 +49,32 @@
     </div>
 @endif
 
+@if($paseosPendientesPago->isNotEmpty())
+    <div class="mb-8 space-y-4">
+        @foreach($paseosPendientesPago as $ppp)
+            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 p-5 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-sm">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 flex items-center justify-center rounded-xl bg-blue-500/10 text-blue-600">
+                        <!-- Icono de billetera / pago -->
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-6.188 3.197L1.125 19.5V4.5h21.75V19.5l-2.188-1.053a2.25 2.25 0 0 0-2.074 0l-2.188 1.053a2.25 2.25 0 0 1-2.074 0l-2.188-1.053a2.25 2.25 0 0 0-2.074 0L8.25 19.5l-2.188-1.053a2.25 2.25 0 0 0-2.074 0l-2.188 1.053a2.25 2.25 0 0 1-2.074 0Z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h6 class="text-sm font-black text-brand-dark">¡Paseo para {{ $ppp->mascota->nombre }} aceptado!</h6>
+                        <p class="text-xs text-gray-500 mt-0.5">El paseador <strong>{{ $ppp->paseador->nombres }}</strong> ha aceptado tu solicitud. Ya es hora de realizar el pago.</p>
+                    </div>
+                </div>
+                <div class="shrink-0">
+                    <a href="{{ route('pagos.simulacion', $ppp->id) }}" class="inline-block bg-brand-primary hover:bg-brand-primary-hover text-white font-extrabold text-xs px-5 py-2.5 rounded-xl shadow-md shadow-brand-primary/10 hover:shadow-lg transition duration-200 cursor-pointer no-underline">
+                        Pagar Paseo →
+                    </a>
+                </div>
+            </div>
+        @endforeach
+    </div>
+@endif
+
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
     <!-- Card 1: Paseos Activos -->
     <div id="card-paseos" class="bg-white p-6 rounded-3xl border border-slate-100/80 shadow-sm hover:shadow-lg hover:-translate-y-1 transition duration-300 flex items-center justify-between cursor-pointer active-card" onclick="switchTab('paseos')">

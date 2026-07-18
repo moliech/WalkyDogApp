@@ -71,6 +71,7 @@ class ProfileController extends Controller
             'username' => ['required', 'string', 'max:255', 'unique:users,username,' . $user->id],
             'telefono' => ['nullable', 'string', 'max:20'],
             'direccion' => ['required', 'string', 'max:255'],
+            'avatar' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:2048'], // Imagen de máx 2MB
         ];
         // Validaciones condicionales si es un Paseador
         if ($user->perfilPaseador) {
@@ -79,6 +80,19 @@ class ProfileController extends Controller
             $rules['documento_soporte'] = ['nullable', 'file', 'mimes:pdf', 'max:2048']; // PDF de máx 2MB
         }
         $validated = $request->validate($rules);
+
+        // Subir avatar si se cargó una imagen nueva
+        if ($request->hasFile('avatar')) {
+            $file = $request->file('avatar');
+            // Eliminamos la foto vieja si existía
+            if ($user->avatar && \Illuminate\Support\Facades\Storage::disk('public')->exists($user->avatar)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($user->avatar);
+            }
+            // Guardamos la nueva foto
+            $path = $file->store('avatars', 'public');
+            $user->avatar = $path; // Asignamos la ruta correcta (ej. 'avatars/xyz.png')
+        }
+
         // Actualizar datos de usuario
         $user->update([
             'nombres' => $validated['nombres'],
@@ -86,7 +100,11 @@ class ProfileController extends Controller
             'username' => $validated['username'],
             'telefono' => $validated['telefono'] ?? null,
             'direccion' => $validated['direccion'],
+            'avatar' => $user->avatar,
         ]);
+
+
+
         // Actualizar datos del perfil de paseador si aplica
         if ($user->perfilPaseador) {
             $perfilData = [

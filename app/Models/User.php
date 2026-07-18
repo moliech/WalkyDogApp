@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Model;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
 
-#[Fillable(['nombres', 'apellidos', 'email', 'password', 'telefono', 'direccion', 'username', 'rol'])]
+#[Fillable(['nombres', 'apellidos', 'email', 'password', 'telefono', 'direccion', 'username', 'rol', 'avatar'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable implements JWTSubject
 {

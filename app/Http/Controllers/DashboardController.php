@@ -97,6 +97,12 @@ class DashboardController extends Controller
                     ->whereHas('mascota', function ($q) use ($user) {
                         $q->where('propietario_id', $user->id);
                     })->get();
+
+                $paseosPendientesPago = Paseo::with(['mascota', 'paseador'])
+                    ->where('estado', 'esperando_pago')
+                    ->whereHas('mascota', function ($q) use ($user) {
+                        $q->where('propietario_id', $user->id);
+                    })->get();
             }
         }
 
@@ -104,8 +110,11 @@ class DashboardController extends Controller
         if (!isset($paseosPorCalificar)) {
             $paseosPorCalificar = collect();
         }
+        if (!isset($paseosPendientesPago)) {
+            $paseosPendientesPago = collect();
+        }
 
-        return view('dashboard', compact('metricas', 'paseosActivos', 'mascotas', 'paseadores', 'novedades', 'paseosPorCalificar'));
+        return view('dashboard', compact('metricas', 'paseosActivos', 'mascotas', 'paseadores', 'novedades', 'paseosPorCalificar', 'paseosPendientesPago'));
     }
 
     public function editarPerfil()

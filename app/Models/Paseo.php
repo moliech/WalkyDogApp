@@ -43,4 +43,38 @@ class Paseo extends Model
     {
         return $this->hasMany(Novedad::class, 'paseo_id');
     }
+
+    /**
+     * Scope para buscar por nombre de la mascota
+     */
+    public function scopeBuscarMascota($query, $nombre)
+    {
+        if (empty($nombre)) return $query;
+        return $query->whereHas('mascota', function ($q) use ($nombre) {
+            $q->where('nombre', 'LIKE', "%{$nombre}%");
+        });
+    }
+
+    /**
+     * Scope para filtrar por estado
+     */
+    public function scopeFiltrarEstado($query, $estado)
+    {
+        if (empty($estado)) return $query;
+        return $query->where('estado', $estado);
+    }
+
+    /**
+     * Scope para filtrar por rango de fechas de creación
+     */
+    public function scopeRangoFechas($query, $fechaInicio, $fechaFin)
+    {
+        if (!empty($fechaInicio)) {
+            $query->whereDate('created_at', '>=', $fechaInicio);
+        }
+        if (!empty($fechaFin)) {
+            $query->whereDate('created_at', '<=', $fechaFin);
+        }
+        return $query;
+    }
 }

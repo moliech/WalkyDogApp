@@ -20,6 +20,30 @@
             @csrf
             @method('PUT')
 
+            <!-- Avatar / Foto de Perfil -->
+            <div class="flex flex-col items-center sm:flex-row gap-6 p-5 bg-slate-50 rounded-2xl border border-slate-100 mb-6">
+                <div class="relative group shrink-0">
+                    <div class="rounded-full overflow-hidden border-2 border-brand-primary shadow-sm bg-white flex items-center justify-center" style="width: 80px; height: 80px; flex-shrink: 0;">
+                        @if(auth()->user()->avatar)
+                            <img id="avatar-preview" src="{{ asset('storage/' . auth()->user()->avatar) }}" class="w-full h-full object-cover" alt="Vista previa del avatar">
+                        @else
+                            <svg id="avatar-placeholder" class="w-10 h-10 text-gray-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"/>
+                            </svg>
+                            <img id="avatar-preview" src="" class="w-full h-full object-cover hidden" alt="Vista previa del avatar">
+                        @endif
+                    </div>
+                </div>
+                <div class="flex-1 text-center sm:text-left min-w-0">
+                    <label class="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-1">Foto de Perfil</label>
+                    <input type="file" name="avatar" id="avatar-input" accept="image/*" class="rounded-xl border @error('avatar') border-red-500 @else border-gray-200 @enderror px-3 py-1.5 text-xs focus:border-brand-primary outline-none bg-white cursor-pointer w-full sm:w-auto mb-1.5" onchange="previewImage(event)">
+                    <p class="text-[10px] text-gray-400 leading-relaxed font-semibold">Formatos permitidos: JPG, PNG, GIF. Máximo 2MB.</p>
+                    @error('avatar')
+                        <span class="text-red-500 text-xs mt-1 font-bold block">{{ $message }}</span>
+                    @enderror
+                </div>
+            </div>
+
             <!-- Nombres y Apellidos -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="flex flex-col">
@@ -119,4 +143,23 @@
         </form>
     </div>
 </div>
+<script>
+    function previewImage(event) {
+        const input = event.target;
+        const reader = new FileReader();
+        reader.onload = function(){
+            const preview = document.getElementById('avatar-preview');
+            const placeholder = document.getElementById('avatar-placeholder');
+            
+            preview.src = reader.result;
+            preview.classList.remove('hidden');
+            if (placeholder) {
+                placeholder.classList.add('hidden');
+            }
+        };
+        if (input.files && input.files[0]) {
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>
 @endsection
