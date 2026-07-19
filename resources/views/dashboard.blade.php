@@ -4,9 +4,19 @@
 <script type="text/javascript" src="https://unpkg.com/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
 
 @section('content')
-<div class="py-6 mb-6">
-    <h2 class="text-3xl font-black text-brand-dark tracking-tight">Panel de Control WalkyDog</h2>
-    <p class="text-gray-400 font-semibold mt-1">Monitorea las métricas en tiempo real. Haz clic en cualquier tarjeta para ver el listado detallado.</p>
+<div class="py-6 mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <div>
+        <h2 class="text-3xl font-black text-brand-dark tracking-tight">Panel de Control WalkyDog</h2>
+        <p class="text-gray-400 font-semibold mt-1">Monitorea las métricas en tiempo real. Haz clic en cualquier tarjeta para ver el listado detallado.</p>
+    </div>
+    @if(auth()->check() && !auth()->user()->isAdmin() && !auth()->user()->perfilPaseador)
+        <a href="{{ route('paseos.catalogo-qr-pdf') }}" class="bg-brand-primary hover:bg-brand-primary-hover text-white text-xs font-black px-4 py-3 rounded-2xl transition flex items-center gap-1.5 no-underline shadow-lg shadow-brand-primary/10 cursor-pointer">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 18V6a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 6v12a2.25 2.25 0 0 1-2.25 2.25H15M9 3v3m3-3v3m3-3v3"/>
+            </svg>
+            Dossier Propuesta QR & Logo PDF
+        </a>
+    @endif
 </div>
 
 @if(session('success'))
