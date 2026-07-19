@@ -573,4 +573,21 @@ class PaseoController extends Controller
             'paseo' => $paseo
         ], 200);
     }
+
+    public function getStatus($id)
+    {
+        $paseo = Paseo::findOrFail($id);
+        
+        /** @var \App\Models\User $user */
+        $user = auth()->user();
+        
+        // Seguridad: Solo el dueño de la mascota, paseador o admin
+        if ($user->id !== $paseo->paseador_id && $user->id !== $paseo->mascota->propietario_id && !$user->isAdmin()) {
+            return response()->json(['error' => 'No autorizado'], 403);
+        }
+
+        return response()->json([
+            'estado' => $paseo->estado
+        ]);
+    }
 }

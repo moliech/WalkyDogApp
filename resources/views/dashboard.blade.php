@@ -1,6 +1,8 @@
 @extends('layouts.app')
 @section('title', 'Dashboard')
 
+<script type="text/javascript" src="https://unpkg.com/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
+
 @section('content')
 <div class="py-6 mb-6">
     <h2 class="text-3xl font-black text-brand-dark tracking-tight">Panel de Control WalkyDog</h2>
@@ -168,7 +170,7 @@
                             @if(auth()->check() && !auth()->user()->isAdmin() && !auth()->user()->perfilPaseador)
                                 <td class="p-3">
                                     @if($pa->estado == 'programado')
-                                        <button onclick="showQrModal('{{ $pa->token_qr }}', '{{ $pa->mascota->nombre }}')" class="bg-brand-primary hover:bg-brand-primary-hover text-white text-xs font-bold px-4 py-2 rounded-xl transition cursor-pointer">
+                                        <button onclick="showQrModal('{{ $pa->token_qr }}', '{{ $pa->mascota->nombre }}', '{{ $pa->id }}')" class="bg-brand-primary hover:bg-brand-primary-hover text-white text-xs font-bold px-4 py-2 rounded-xl transition cursor-pointer">
                                             Mostrar QR de Inicio
                                         </button>
                                     @else
@@ -343,8 +345,8 @@
             </div>
             <div class="modal-body flex flex-col items-center py-6">
                 <p class="text-sm text-gray-400 font-semibold mb-4 leading-relaxed">Presenta este código al paseador para que lo escanee e inicie el recorrido de tu mascota.</p>
-                <div class="bg-slate-50 p-4 rounded-3xl border border-slate-100">
-                    <img id="qrImage" src="" alt="Código QR de Validación" class="w-48 h-48">
+                <div class="bg-slate-50 p-4 rounded-3xl border border-slate-100 flex justify-center items-center">
+                    <div id="canvas-qr" class="w-48 h-48 flex items-center justify-center"></div>
                 </div>
             </div>
         </div>
@@ -352,15 +354,86 @@
 </div>
 
 <script>
-    function showQrModal(token, mascotaNombre) {
-        // Configuramos la URL de la API de Códigos QR para renderizar el token dinámico
-        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${token}`;
-        document.getElementById('qrImage').src = qrUrl;
+    let qrPollInterval = null;
+
+    document.getElementById('qrModal').addEventListener('hidden.bs.modal', function () {
+        if (qrPollInterval) {
+            clearInterval(qrPollInterval);
+            qrPollInterval = null;
+        }
+    });
+
+    function showQrModal(token, mascotaNombre, paseoId) {
         document.getElementById('qrModalLabel').innerText = `Validación de Paseo - ${mascotaNombre}`;
         
+        // Limpiamos el canvas anterior
+        const canvas = document.getElementById('canvas-qr');
+        canvas.innerHTML = "";
+
+        // Instanciar QRCodeStyling con diseño redondeado premium y logo en el centro
+        const qrCode = new QRCodeStyling({
+            width: 192,
+            height: 192,
+            type: "svg",
+            data: token,
+            image: "/images/walkydog_logo.png",
+            dotsOptions: {
+                color: "#d35400",
+                type: "rounded"
+            },
+            backgroundOptions: {
+                color: "#f8fafc",
+            },
+            imageOptions: {
+                crossOrigin: "anonymous",
+                margin: 4
+            }
+        });
+        qrCode.append(canvas);
+
         // Mostrar Modal por Bootstrap
-        const myModal = new bootstrap.Modal(document.getElementById('qrModal'));
+        const qrModalEl = document.getElementById('qrModal');
+        const myModal = new bootstrap.Modal(qrModalEl);
         myModal.show();
+
+        // Iniciar polling asíncrono cada 2 segundos para ver si el paseo inició
+        if (qrPollInterval) clearInterval(qrPollInterval);
+        
+        qrPollInterval = setInterval(async () => {
+            try {
+                const response = await fetch(`/paseos/${paseoId}/status`);
+                if (!response.ok) return;
+                const data = await response.json();
+                
+                if (data.estado === 'en_progreso') {
+                    // Detener polling
+                    clearInterval(qrPollInterval);
+                    qrPollInterval = null;
+                    
+                    // Cerrar el modal actual
+                    const bsModal = bootstrap.Modal.getInstance(qrModalEl);
+                    if (bsModal) bsModal.hide();
+                    
+                    // Mostrar alerta de éxito estilizada en la página
+                    const alertHtml = `
+                        <div class="fixed top-5 right-5 z-[9999] bg-emerald-500 text-white font-extrabold text-sm py-4 px-6 rounded-2xl shadow-xl flex items-center gap-3 animate-bounce">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"></path>
+                            </svg>
+                            <span>¡Paseo para ${mascotaNombre} iniciado! Redirigiendo al mapa...</span>
+                        </div>
+                    `;
+                    document.body.insertAdjacentHTML('beforeend', alertHtml);
+
+                    // Redirigir al monitoreo GPS después de 2.5 segundos
+                    setTimeout(() => {
+                        window.location.href = "{{ route('paseos.monitoreo') }}";
+                    }, 2500);
+                }
+            } catch (err) {
+                console.error("Error polling paseo status", err);
+            }
+        }, 2000);
     }
 </script>
 @endsection
