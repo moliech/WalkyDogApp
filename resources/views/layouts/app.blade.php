@@ -295,7 +295,7 @@
                             <select name="paseador_id" required class="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 transition duration-200 outline-none text-brand-dark bg-white">
                                 @isset($activeWalkers)
                                     @forelse($activeWalkers as $walker)
-                                        <option value="{{ $walker->id }}">{{ $walker->nombres }} {{ $walker->apellidos }} (Calificación: {{ $walker->perfilPaseador->calificacion_promedio ?? '5.0' }})</option>
+                                         <option value="{{ $walker->id }}">{{ $walker->nombres }} {{ $walker->apellidos }} (Calificación: {{ $walker->perfilPaseador->calificacion_promedio ?? '5.0' }}{{ !empty($walker->perfilPaseador->porcentaje_recargo) && $walker->perfilPaseador->porcentaje_recargo > 0 ? ' | Recargo: +' . $walker->perfilPaseador->porcentaje_recargo . '%' : '' }})</option>
                                     @empty
                                         <option value="">No hay paseadores activos disponibles</option>
                                     @endforelse

@@ -77,6 +77,7 @@ class DatabaseSeeder extends Seeder
             'calificacion_promedio' => 4.90,
             'estado' => 'activo',
             'documento_soporte' => 'soportes/cedula_carlos.pdf',
+            'porcentaje_recargo' => 15,
         ]);
 
         // 4. Crear un Paseo para tu perro Toby asignado a Carlos Mendoza

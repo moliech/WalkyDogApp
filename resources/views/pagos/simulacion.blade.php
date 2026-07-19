@@ -10,29 +10,44 @@
     $tamanoObj = \App\Models\MascotaTamano::where('nombre', $mascota->tamano)->first();
     $tarifaBase = $tamanoObj ? $tamanoObj->tarifa_por_hora : 12000;
     
-    // Recargo del paseador
-    $porcentajeRecargo = 0;
-    $recargoMonto = 0;
-    if ($paseador && $paseador->perfilPaseador) {
-        $perfil = $paseador->perfilPaseador;
-        $ajustes = \App\Models\AjusteTarifa::first();
-        $minCalificacion = $ajustes ? $ajustes->calificacion_minima : 4.5;
-        $maxPorcentaje = $ajustes ? $ajustes->porcentaje_maximo : 20;
-        
-        if ($perfil->calificacion_promedio >= $minCalificacion && $perfil->porcentaje_recargo > 0) {
-            $porcentajeRecargo = min($perfil->porcentaje_recargo, $maxPorcentaje);
-            $recargoMonto = ($tarifaBase * $porcentajeRecargo) / 100;
-        }
-    }
-    
-    // Tarifa total por hora
-    $tarifaPorHoraTotal = $tarifaBase + $recargoMonto;
-    
-    // Duración calculada
+    // Duración calculada basada estrictamente en la tarifa base del momento de reserva
     $duracionHoras = 1;
-    if ($tarifaPorHoraTotal > 0) {
-        $duracionHoras = round($paseo->pago->monto / $tarifaPorHoraTotal);
+    if ($tarifaBase > 0) {
+        $duracionHoras = round($paseo->pago->monto / $tarifaBase);
+        // Si hay decimales muy pequeños por recargo, redondeamos a la duración entera más cercana
+        $montoTotal = $paseo->pago->monto;
+        
+        // Si el total es mayor al esperado base, deducimos el recargo exacto cobrado
+        $montoEsperadoBase = $duracionHoras * $tarifaBase;
+        if ($montoTotal > $montoEsperadoBase && $duracionHoras > 0) {
+            $recargoTotal = $montoTotal - $montoEsperadoBase;
+            $recargoMonto = $recargoTotal / $duracionHoras;
+            $porcentajeRecargo = round(($recargoMonto / $tarifaBase) * 100);
+        } else {
+            // Reajustamos en caso de que el recargo haga cambiar el redondeo de duración
+            $ajustes = \App\Models\AjusteTarifa::first();
+            $maxPorcentaje = $ajustes ? $ajustes->porcentaje_maximo : 20;
+            $maxTarifaConRecargo = $tarifaBase * (1 + ($maxPorcentaje / 100));
+            
+            $duracionHoras = round($montoTotal / $maxTarifaConRecargo);
+            if ($duracionHoras <= 0) $duracionHoras = 1;
+            
+            $montoEsperadoBase = $duracionHoras * $tarifaBase;
+            if ($montoTotal > $montoEsperadoBase) {
+                $recargoTotal = $montoTotal - $montoEsperadoBase;
+                $recargoMonto = $recargoTotal / $duracionHoras;
+                $porcentajeRecargo = round(($recargoMonto / $tarifaBase) * 100);
+            } else {
+                $porcentajeRecargo = 0;
+                $recargoMonto = 0;
+            }
+        }
+    } else {
+        $porcentajeRecargo = 0;
+        $recargoMonto = 0;
     }
+    
+    $tarifaPorHoraTotal = $tarifaBase + $recargoMonto;
 @endphp
 
 <div class="flex justify-center py-8">

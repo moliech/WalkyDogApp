@@ -23,6 +23,10 @@ RUN apk add --no-cache nginx postgresql-dev mysql-client libpng-dev libjpeg-turb
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install pdo pdo_mysql pdo_pgsql gd
 
+# Configurar límites de subida de archivos en PHP para el perfil
+RUN echo "upload_max_filesize = 20M" > /usr/local/etc/php/conf.d/uploads.ini && \
+    echo "post_max_size = 20M" >> /usr/local/etc/php/conf.d/uploads.ini
+
 WORKDIR /var/www/html
 COPY . .
 
