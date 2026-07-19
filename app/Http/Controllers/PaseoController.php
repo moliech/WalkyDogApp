@@ -590,12 +590,4 @@ class PaseoController extends Controller
             'estado' => $paseo->estado
         ]);
     }
-
-    public function exportarCatalogoQr()
-    {
-        $pdf = Pdf::loadView('pdf.catalogo-qr')
-                  ->setPaper('letter', 'portrait');
-                  
-        return $pdf->download('catalogo-estilos-qr-walkydog.pdf');
-    }
 }
