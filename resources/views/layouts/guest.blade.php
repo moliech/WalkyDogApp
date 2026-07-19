@@ -18,7 +18,7 @@
         <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0">
             <div class="mb-4">
                 <a href="/" class="text-3xl font-black text-brand-dark no-underline tracking-tight">
-                    WalkyDog <span class="text-brand-primary">🐾</span>
+                    WalkyDog
                 </a>
             </div>
 
