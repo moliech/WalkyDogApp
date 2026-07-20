@@ -49,6 +49,7 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->password),
             'telefono' => $request->telefono,
             'direccion' => $request->direccion,
+            'rol' => $request->rol,
         ]);
 
         if ($request->rol === 'paseador') {

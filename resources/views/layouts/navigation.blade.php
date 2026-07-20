@@ -19,7 +19,17 @@
             </div>
 
             <!-- Settings Dropdown -->
-            <div class="hidden sm:flex sm:items-center sm:ms-6">
+            <div class="hidden sm:flex sm:items-center sm:ms-6 gap-4">
+                <!-- Selector de Roles Simulados para Sustentación -->
+                <form id="role-switcher-form" method="POST" action="{{ route('role.switch') }}" class="inline-flex items-center">
+                    @csrf
+                    <select name="simulated_role" onchange="document.getElementById('role-switcher-form').submit()" class="text-xs font-black rounded-xl border border-gray-200 px-3 py-1.5 focus:border-brand-primary outline-none bg-slate-50 text-brand-dark cursor-pointer shadow-sm">
+                        <option value="propietario" {{ (session('simulated_role') ?? auth()->user()->rol) === 'propietario' ? 'selected' : '' }}>Vista: Propietario</option>
+                        <option value="paseador" {{ (session('simulated_role') ?? auth()->user()->rol) === 'paseador' ? 'selected' : '' }}>Vista: Paseador</option>
+                        <option value="admin" {{ (session('simulated_role') ?? auth()->user()->rol) === 'admin' ? 'selected' : '' }}>Vista: Administrador</option>
+                    </select>
+                </form>
+
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
                         <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
@@ -74,9 +84,20 @@
 
         <!-- Responsive Settings Options -->
         <div class="pt-4 pb-1 border-t border-gray-200">
-            <div class="px-4">
-                <div class="font-medium text-base text-gray-800">{{ Auth::user()->name }}</div>
-                <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
+            <div class="px-4 flex justify-between items-center">
+                <div>
+                    <div class="font-medium text-base text-gray-800">{{ Auth::user()->name }}</div>
+                    <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
+                </div>
+                <!-- Selector de Roles Móvil -->
+                <form id="role-switcher-form-mobile" method="POST" action="{{ route('role.switch') }}">
+                    @csrf
+                    <select name="simulated_role" onchange="document.getElementById('role-switcher-form-mobile').submit()" class="text-xs font-black rounded-xl border border-gray-200 px-3 py-1.5 focus:border-brand-primary outline-none bg-slate-50 text-brand-dark cursor-pointer shadow-sm">
+                        <option value="propietario" {{ (session('simulated_role') ?? auth()->user()->rol) === 'propietario' ? 'selected' : '' }}>Propietario</option>
+                        <option value="paseador" {{ (session('simulated_role') ?? auth()->user()->rol) === 'paseador' ? 'selected' : '' }}>Paseador</option>
+                        <option value="admin" {{ (session('simulated_role') ?? auth()->user()->rol) === 'admin' ? 'selected' : '' }}>Admin</option>
+                    </select>
+                </form>
             </div>
 
             <div class="mt-3 space-y-1">

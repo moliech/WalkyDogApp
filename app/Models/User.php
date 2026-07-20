@@ -23,25 +23,42 @@ class User extends Authenticatable implements JWTSubject
     /**
      * Determina si el usuario tiene el rol Administrador.
      */
-    public function isAdmin(): bool
+    public function isAdmin()
     {
+        if (request()->hasSession() && session()->has('simulated_role')) {
+            return session('simulated_role') === 'admin';
+        }
         return $this->rol === 'admin';
     }
 
-    /**
+     /**
      * Determina si el usuario tiene el rol Paseador.
      */
-    public function isPaseador(): bool
+    public function isPaseador()
     {
+        if (request()->hasSession() && session()->has('simulated_role')) {
+            return session('simulated_role') === 'paseador';
+        }
         return $this->rol === 'paseador';
     }
 
-    /**
+     /**
      * Determina si el usuario tiene el rol Propietario.
      */
-    public function isPropietario(): bool
+    public function isPropietario()
     {
+        if (request()->hasSession() && session()->has('simulated_role')) {
+            return session('simulated_role') === 'propietario';
+        }
         return $this->rol === 'propietario';
+    }
+
+    public function getActiveRole()
+    {
+        if (request()->hasSession() && session()->has('simulated_role')) {
+            return session('simulated_role');
+        }
+        return $this->rol;
     }
 
     /**

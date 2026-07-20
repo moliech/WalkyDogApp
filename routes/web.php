@@ -32,6 +32,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/pagos/historial', [PaseoController::class, 'historialPagos'])->name('pagos.historial');
     Route::get('/paseos/exportar-pdf', [PaseoController::class, 'exportarPdf'])->name('paseos.exportar-pdf');
     Route::get('/paseos/{id}/status', [PaseoController::class, 'getStatus'])->name('paseos.status');
+    Route::post('/role/switch', [\App\Http\Controllers\DashboardController::class, 'switchRole'])->name('role.switch');
     Route::get('/notificaciones/{id}/ir', [\App\Http\Controllers\NotificationController::class, 'readAndRedirect'])->name('notificaciones.ir');
     Route::post('/notificaciones/marcar-leidas', [\App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('notificaciones.marcar-leidas');
     Route::get('/api/notificaciones/unread', [\App\Http\Controllers\NotificationController::class, 'getUnread'])->name('api.notificaciones.unread');

@@ -23,7 +23,7 @@ class VerificarRol
         $user = auth()->user();
 
         // 2. Comprobar si el rol del usuario está dentro de los permitidos para la ruta
-        if (!in_array($user->rol, $roles)) {
+        if (!in_array($user->getActiveRole(), $roles)) {
             abort(403, 'No tienes autorización para acceder a esta sección.');
         }
 

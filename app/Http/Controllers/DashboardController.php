@@ -39,7 +39,7 @@ class DashboardController extends Controller
             $novedades = Novedad::with('paseo.mascota')->orderBy('registrado_at', 'desc')->take(10)->get();
         } else {
             // Si es un usuario de negocio, determinamos su rol
-            $esPaseador = $user->perfilPaseador ? true : false;
+            $esPaseador = $user->isPaseador();
 
             if ($esPaseador) {
                 // El Paseador ve datos referentes a sus servicios
@@ -127,7 +127,7 @@ class DashboardController extends Controller
             'email' => $user->email,
             'telefono' => $user->telefono ?? 'No registrado',
             'direccion' => $user->direccion,
-            'es_paseador' => $user->perfilPaseador ? true : false,
+            'es_paseador' => $user->isPaseador(),
             'identificacion' => $user->perfilPaseador->identificacion ?? '',
             'experiencia_meses' => $user->perfilPaseador->experiencia_meses ?? '',
             'estado_paseador' => $user->perfilPaseador->estado ?? '',
@@ -136,5 +136,36 @@ class DashboardController extends Controller
         ];
 
         return view('perfil.editar', compact('usuario'));
+    }
+
+    public function switchRole(Request $request)
+    {
+        $request->validate([
+            'simulated_role' => 'required|in:admin,paseador,propietario'
+        ]);
+
+        $role = $request->simulated_role;
+        
+        /** @var \App\Models\User $user */
+        $user = auth()->user();
+
+        if ($role === $user->rol) {
+            session()->forget('simulated_role');
+        } else {
+            // Si cambia a paseador y no tiene perfil, se lo creamos en estado activo para pruebas
+            if ($role === 'paseador' && !$user->perfilPaseador) {
+                \App\Models\PaseadorPerfil::create([
+                    'user_id' => $user->id,
+                    'identificacion' => 'SIMULADOR-' . $user->id,
+                    'experiencia_meses' => 12,
+                    'calificacion_promedio' => 5.0,
+                    'estado' => 'activo',
+                    'porcentaje_recargo' => 10,
+                ]);
+            }
+            session(['simulated_role' => $role]);
+        }
+
+        return redirect()->route('dashboard')->with('success', '¡Cambiado a vista de: ' . ucfirst($role) . '!');
     }
 }
