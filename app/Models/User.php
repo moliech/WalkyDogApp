@@ -39,7 +39,7 @@ class User extends Authenticatable implements JWTSubject
         if (request()->hasSession() && session()->has('simulated_role')) {
             return session('simulated_role') === 'paseador';
         }
-        return $this->rol === 'paseador';
+        return $this->rol === 'paseador' && $this->perfilPaseador && $this->perfilPaseador->estado === 'activo';
     }
 
      /**

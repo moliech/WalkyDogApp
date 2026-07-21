@@ -53,3 +53,31 @@ test('users can logout', function () {
     $this->assertGuest();
     $response->assertRedirect('/');
 });
+
+test('users can authenticate using username', function () {
+    $user = User::factory()->create([
+        'username' => 'testuser',
+    ]);
+
+    $response = $this->post('/login', [
+        'email' => 'testuser',
+        'password' => 'password',
+    ]);
+
+    $this->assertGuest();
+    $response->assertRedirect(route('otp.verify'));
+
+    // Recuperar código OTP generado
+    $otp = $user->fresh()->otp_code;
+
+    // Simular el ingreso del OTP
+    $verifyResponse = $this->withSession([
+        'otp_user_id' => $user->id,
+        'otp_remember' => false
+    ])->post('/otp-verify', [
+        'code' => $otp,
+    ]);
+
+    $this->assertAuthenticatedAs($user);
+    $verifyResponse->assertRedirect(route('dashboard', absolute: false));
+});

@@ -149,7 +149,7 @@
                         <th class="p-3 font-bold text-gray-400 uppercase tracking-wider text-xs">Mascota</th>
                         <th class="p-3 font-bold text-gray-400 uppercase tracking-wider text-xs">Paseador</th>
                         <th class="p-3 font-bold text-gray-400 uppercase tracking-wider text-xs">Hora Inicio</th>
-                        @if(auth()->check() && !auth()->user()->isAdmin() && !auth()->user()->perfilPaseador)
+                        @if(auth()->check() && !auth()->user()->isAdmin() && !auth()->user()->isPaseador())
                             <th class="p-3 font-bold text-gray-400 uppercase tracking-wider text-xs">Acción</th>
                         @endif
                     </tr>
@@ -167,7 +167,7 @@
                                     <span class="text-[10px] font-extrabold uppercase tracking-widest bg-emerald-500/10 text-emerald-600 px-3 py-1 rounded-full">En Curso</span>
                                 @endif
                             </td>
-                            @if(auth()->check() && !auth()->user()->isAdmin() && !auth()->user()->perfilPaseador)
+                            @if(auth()->check() && !auth()->user()->isAdmin() && !auth()->user()->isPaseador())
                                 <td class="p-3">
                                     @if($pa->estado == 'programado')
                                         <button onclick="showQrModal('{{ $pa->token_qr }}', '{{ $pa->mascota->nombre }}', '{{ $pa->id }}')" class="bg-brand-primary hover:bg-brand-primary-hover text-white text-xs font-bold px-4 py-2 rounded-xl transition cursor-pointer">
@@ -181,7 +181,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="{{ (auth()->check() && !auth()->user()->isAdmin() && !auth()->user()->perfilPaseador) ? 5 : 4 }}" class="p-6 text-center text-gray-400 italic">No hay paseos activos en este momento.</td>
+                            <td colspan="{{ (auth()->check() && !auth()->user()->isAdmin() && !auth()->user()->isPaseador()) ? 5 : 4 }}" class="p-6 text-center text-gray-400 italic">No hay paseos activos en este momento.</td>
                         </tr>
                     @endforelse
                 </tbody>
