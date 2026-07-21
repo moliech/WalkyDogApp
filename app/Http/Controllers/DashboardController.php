@@ -131,8 +131,10 @@ class DashboardController extends Controller
             'identificacion' => $user->perfilPaseador->identificacion ?? '',
             'experiencia_meses' => $user->perfilPaseador->experiencia_meses ?? '',
             'estado_paseador' => $user->perfilPaseador->estado ?? '',
-            'calificacion_promedio' => $user->perfilPaseador->calificacion_promedio ?? 5.00,
+            'calificacion_promedio' => $user->perfilPaseador->calificacion_promedio ?? 0.00,
             'porcentaje_recargo' => $user->perfilPaseador->porcentaje_recargo ?? 0,
+            'documento_soporte' => $user->perfilPaseador->documento_soporte ?? '',
+            'observacion_rechazo' => $user->perfilPaseador->observacion_rechazo ?? '',
         ];
 
         return view('perfil.editar', compact('usuario'));
@@ -143,6 +145,11 @@ class DashboardController extends Controller
         $request->validate([
             'simulated_role' => 'required|in:admin,paseador,propietario'
         ]);
+
+        // Solo los administradores reales en la base de datos pueden simular roles
+        if (auth()->user()->rol !== 'admin') {
+            abort(403, 'No tienes autorización para simular roles.');
+        }
 
         $role = $request->simulated_role;
         

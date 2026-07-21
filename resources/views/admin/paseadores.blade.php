@@ -23,7 +23,13 @@
         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z"/>
         </svg>
-        Usuarios Registrados
+        Clientes
+    </a>
+    <a href="{{ route('admin.administradores') }}" class="py-3 px-4 text-sm font-bold text-gray-400 hover:text-brand-primary no-underline transition flex items-center gap-1.5">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+        </svg>
+        Administradores
     </a>
 </div>
 
@@ -90,12 +96,9 @@
                                 ✓ Aprobar Paseador
                             </button>
                         </form>
-                        <form method="POST" action="{{ route('admin.paseadores.rechazar', $perfil->id) }}" class="flex-1">
-                            @csrf
-                            <button type="submit" class="w-full bg-brand-accent-red/10 hover:bg-brand-accent-red hover:text-white text-brand-accent-red font-extrabold text-xs py-2.5 px-4 rounded-xl transition">
-                                ✗ Rechazar
-                            </button>
-                        </form>
+                        <button type="button" onclick="openRejectModal('{{ route('admin.paseadores.rechazar', $perfil->id) }}', '{{ $perfil->user->nombres }} {{ $perfil->user->apellidos }}', false)" class="flex-1 w-full bg-brand-accent-red/10 hover:bg-brand-accent-red hover:text-white text-brand-accent-red font-extrabold text-xs py-2.5 px-4 rounded-xl transition cursor-pointer border-0">
+                            ✗ Rechazar
+                        </button>
                     </div>
                 </div>
             @empty
@@ -117,7 +120,8 @@
         </h4>
         
         <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
-            <table class="w-full text-left border-collapse text-sm">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-sm min-w-[700px]">
                 <thead>
                     <tr class="bg-slate-50 border-b border-gray-100">
                         <th class="p-4 font-bold text-gray-400 uppercase tracking-wider text-xs">Paseador</th>
@@ -155,13 +159,14 @@
                                     <span class="text-xs text-gray-400 italic">No cargado</span>
                                 @endif
                             </td>
-                            <td class="p-4">
-                                <form method="POST" action="{{ route('admin.paseadores.rechazar', $perfil->id) }}">
-                                    @csrf
-                                    <button type="submit" class="text-xs font-bold text-brand-accent-red hover:underline bg-transparent border-0 cursor-pointer">
-                                        Desactivar
-                                    </button>
-                                </form>
+                            <td class="p-4 whitespace-nowrap text-xs font-bold">
+                                <button onclick="openEditRoleModal('{{ $perfil->user->id }}', '{{ $perfil->user->nombres }} {{ $perfil->user->apellidos }}', '{{ $perfil->user->rol }}')" class="text-brand-primary hover:underline bg-transparent border-0 cursor-pointer p-0 mr-2.5">
+                                    Asignar Rol
+                                </button>
+                                <span class="text-gray-300 mr-2.5">|</span>
+                                <button type="button" onclick="openRejectModal('{{ route('admin.paseadores.rechazar', $perfil->id) }}', '{{ $perfil->user->nombres }} {{ $perfil->user->apellidos }}', true)" class="text-brand-accent-red hover:underline bg-transparent border-0 cursor-pointer p-0">
+                                    Desactivar
+                                </button>
                             </td>
                         </tr>
                     @empty
@@ -174,4 +179,94 @@
         </div>
     </div>
 </div>
+</div>
+
+<!-- Modal Editar Rol -->
+<div class="modal fade" id="editRoleModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content border-0 shadow-2xl p-6 bg-white rounded-3xl">
+            <div class="modal-header border-0 pb-0 flex justify-between items-center">
+                <h5 class="text-lg font-black text-brand-dark">Gestionar Rol</h5>
+                <button type="button" class="btn-close focus:outline-none border-0 bg-transparent text-xl font-bold cursor-pointer text-gray-400 hover:text-gray-600" data-bs-dismiss="modal" aria-label="Close">×</button>
+            </div>
+            <form id="edit-role-form" method="POST" action="">
+                @csrf
+                <div class="modal-body py-4">
+                    <p class="text-xs text-gray-400 font-semibold mb-3">Cambiar el rol de <span id="modal-user-name" class="font-bold text-brand-dark"></span> en el sistema:</p>
+                    <select name="rol" id="modal-user-role" class="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 transition duration-200 outline-none text-brand-dark bg-white">
+                        <option value="propietario">Propietario</option>
+                        <option value="paseador">Paseador</option>
+                        <option value="admin">Administrador</option>
+                    </select>
+                </div>
+                <div class="flex justify-end gap-2 border-0 pt-2">
+                    <button type="button" class="border border-gray-200 text-brand-dark hover:border-brand-primary font-bold text-xs px-4 py-2.5 rounded-xl transition cursor-pointer bg-white" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="bg-brand-primary hover:bg-brand-primary-hover text-white font-extrabold text-xs px-4 py-2.5 rounded-xl transition shadow-sm cursor-pointer border-0">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Confirmar Rechazo/Desactivación -->
+<div class="modal fade" id="rejectModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-md">
+        <div class="modal-content border-0 shadow-2xl p-6 bg-white rounded-3xl">
+            <div class="modal-header border-0 pb-0 flex justify-between items-center">
+                <h5 class="text-lg font-black text-brand-dark" id="reject-modal-title">Confirmar Acción</h5>
+                <button type="button" class="btn-close focus:outline-none border-0 bg-transparent text-xl font-bold cursor-pointer text-gray-400 hover:text-gray-600" data-bs-dismiss="modal" aria-label="Close">×</button>
+            </div>
+            <form id="reject-form" method="POST" action="">
+                @csrf
+                <div class="modal-body py-4">
+                    <p class="text-xs text-gray-500 font-semibold mb-4 leading-relaxed" id="reject-modal-message">
+                        ¿Estás seguro de que deseas rechazar la postulación?
+                    </p>
+                    
+                    <div class="flex flex-col">
+                        <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Motivo / Observación de la decisión</label>
+                        <textarea name="observacion_rechazo" required rows="3" placeholder="Describe brevemente la razón (este motivo le llegará por notificación al usuario y aparecerá en su perfil)..." class="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 transition duration-200 outline-none text-brand-dark bg-white resize-none"></textarea>
+                    </div>
+                </div>
+                <div class="flex justify-end gap-2 border-0 pt-2">
+                    <button type="button" class="border border-gray-200 text-brand-dark hover:border-brand-primary font-bold text-xs px-4 py-2.5 rounded-xl transition cursor-pointer bg-white" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-extrabold text-xs px-4 py-2.5 rounded-xl transition shadow-sm cursor-pointer border-0" id="reject-modal-submit">Confirmar Rechazo</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openEditRoleModal(userId, userName, userRole) {
+        document.getElementById('modal-user-name').innerText = userName;
+        document.getElementById('modal-user-role').value = userRole;
+        
+        const form = document.getElementById('edit-role-form');
+        form.action = `/admin/usuarios/${userId}/actualizar-rol`;
+
+        const modal = new bootstrap.Modal(document.getElementById('editRoleModal'));
+        modal.show();
+    }
+
+    function openRejectModal(actionUrl, userName, isDeactivation = false) {
+        const form = document.getElementById('reject-form');
+        form.action = actionUrl;
+        
+        if (isDeactivation) {
+            document.getElementById('reject-modal-title').innerText = "Desactivar Paseador";
+            document.getElementById('reject-modal-message').innerHTML = `¿Estás seguro de que deseas desactivar a <span class="font-bold text-brand-dark">${userName}</span>? Su perfil pasará a ser el de un cliente básico (propietario) y no podrá recibir más paseos.`;
+            document.getElementById('reject-modal-submit').innerText = "Confirmar Desactivación";
+            document.getElementById('reject-modal-submit').className = "bg-red-600 hover:bg-red-700 text-white font-extrabold text-xs px-4 py-2.5 rounded-xl transition shadow-sm cursor-pointer border-0";
+        } else {
+            document.getElementById('reject-modal-title').innerText = "Rechazar Postulación";
+            document.getElementById('reject-modal-message').innerHTML = `¿Estás seguro de que deseas rechazar la postulación de <span class="font-bold text-brand-dark">${userName}</span>?`;
+            document.getElementById('reject-modal-submit').innerText = "Confirmar Rechazo";
+            document.getElementById('reject-modal-submit').className = "bg-red-600 hover:bg-red-700 text-white font-extrabold text-xs px-4 py-2.5 rounded-xl transition shadow-sm cursor-pointer border-0";
+        }
+
+        const modal = new bootstrap.Modal(document.getElementById('rejectModal'));
+        modal.show();
+    }
+</script>
 @endsection

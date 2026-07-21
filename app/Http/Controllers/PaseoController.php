@@ -33,7 +33,7 @@ class PaseoController extends Controller
             $paseosActivos = Paseo::with(['mascota', 'paseador', 'ubicaciones', 'novedades'])
                 ->where('estado', 'en_progreso')
                 ->get();
-        } elseif ($user->perfilPaseador) {
+        } elseif ($user->isPaseador()) {
             // El Paseador ve los paseos activos que él está realizando
             $paseosActivos = Paseo::with(['mascota', 'paseador', 'ubicaciones', 'novedades'])
                 ->where('paseador_id', $user->id)
@@ -71,7 +71,7 @@ class PaseoController extends Controller
      */
     public function control()
     {
-        if (auth()->check() && !auth()->user()->perfilPaseador) {
+        if (auth()->check() && !auth()->user()->isPaseador()) {
             abort(403, 'Acción exclusiva para paseadores.');
         }
 
@@ -94,7 +94,7 @@ class PaseoController extends Controller
         $user = auth()->user();
 
 
-        if (auth()->check() && ($user->isAdmin() || auth()->user()->perfilPaseador)) {
+        if (auth()->check() && !$user->isPropietario()) {
             abort(403, 'Acción exclusiva para propietarios de mascotas.');
         }
 
@@ -172,7 +172,7 @@ class PaseoController extends Controller
          /** @var \App\Models\User $user */
         $user = auth()->user();
 
-        if (auth()->check() && ($user->isAdmin() || auth()->user()->perfilPaseador)) {
+        if (auth()->check() && !$user->isPropietario()) {
             abort(403, 'Acción exclusiva para propietarios de mascotas.');
         }
 
@@ -198,7 +198,7 @@ class PaseoController extends Controller
          /** @var \App\Models\User $user */
         $user = auth()->user();
 
-        if (auth()->check() && ($user->isAdmin() || auth()->user()->perfilPaseador)) {
+        if (auth()->check() && !$user->isPropietario()) {
             abort(403, 'Acción exclusiva para propietarios de mascotas.');
         }
 
@@ -241,7 +241,7 @@ class PaseoController extends Controller
      */
     public function iniciarPaseo($id)
     {
-        if (auth()->check() && !auth()->user()->perfilPaseador) {
+        if (auth()->check() && !auth()->user()->isPaseador()) {
             abort(403, 'Acción exclusiva para paseadores.');
         }
 
@@ -289,7 +289,7 @@ class PaseoController extends Controller
      */
     public function finalizarPaseo($id)
     {
-        if (auth()->check() && !auth()->user()->perfilPaseador) {
+        if (auth()->check() && !auth()->user()->isPaseador()) {
             abort(403, 'Acción exclusiva para paseadores.');
         }
 
@@ -326,7 +326,7 @@ class PaseoController extends Controller
      */
     public function registrarNovedad(Request $request, $id)
     {
-        if (auth()->check() && !auth()->user()->perfilPaseador) {
+        if (auth()->check() && !auth()->user()->isPaseador()) {
             abort(403, 'Acción exclusiva para paseadores.');
         }
 
@@ -369,7 +369,7 @@ class PaseoController extends Controller
          /** @var \App\Models\User $user */
         $user = auth()->user();
 
-        if (auth()->check() && ($user->isAdmin() || auth()->user()->perfilPaseador)) {
+        if (auth()->check() && !$user->isPropietario()) {
             abort(403, 'Acción exclusiva para propietarios de mascotas.');
         }
 
@@ -399,7 +399,7 @@ class PaseoController extends Controller
          /** @var \App\Models\User $user */
         $user = auth()->user();
 
-        if (auth()->check() && ($user->isAdmin() || auth()->user()->perfilPaseador)) {
+        if (auth()->check() && !$user->isPropietario()) {
             abort(403, 'Acción exclusiva para propietarios de mascotas.');
         }
 
@@ -427,7 +427,7 @@ class PaseoController extends Controller
      */
     public function aceptarPaseo($id)
     {
-        if (auth()->check() && !auth()->user()->perfilPaseador) {
+        if (auth()->check() && !auth()->user()->isPaseador()) {
             abort(403, 'Acción exclusiva para paseadores.');
         }
 
@@ -466,7 +466,7 @@ class PaseoController extends Controller
      */
     public function rechazarPaseo($id)
     {
-        if (auth()->check() && !auth()->user()->perfilPaseador) {
+        if (auth()->check() && !auth()->user()->isPaseador()) {
             abort(403, 'Acción exclusiva para paseadores.');
         }
 
@@ -496,7 +496,7 @@ class PaseoController extends Controller
          /** @var \App\Models\User $user */
         $user = auth()->user();
 
-        if (auth()->check() && ($user->isAdmin() || auth()->user()->perfilPaseador)) {
+        if (auth()->check() && !$user->isPropietario()) {
             abort(403, 'Acción exclusiva para propietarios de mascotas.');
         }
 

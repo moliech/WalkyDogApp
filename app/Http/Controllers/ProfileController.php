@@ -138,4 +138,64 @@ class ProfileController extends Controller
         }
         return redirect()->route('perfil.editar')->with('success', '¡Perfil actualizado correctamente!');
     }
+
+    public function postularse(Request $request)
+    {
+        $user = auth()->user();
+
+        // Validar que no tenga ya una postulación activa o aprobada
+        if ($user->perfilPaseador && $user->perfilPaseador->estado !== 'rechazado') {
+            return back()->withErrors(['error' => 'Ya tienes una postulación en curso o tu perfil ya está activo.']);
+        }
+
+        $validated = $request->validate([
+            'identificacion' => ['required', 'string', 'max:20', 'unique:paseadores_perfiles,identificacion'],
+            'experiencia_meses' => ['required', 'integer', 'min:0'],
+            'documento_soporte' => ['required', 'file', 'mimes:pdf', 'max:2048'], // PDF obligatorio para postularse
+        ]);
+
+        // Subir el documento
+        $file = $request->file('documento_soporte');
+        $path = $file->store('documentos_soporte', 'public');
+
+        if ($user->perfilPaseador && $user->perfilPaseador->estado === 'rechazado') {
+            // Si fue rechazado previamente, actualizamos su postulación anterior
+            $user->perfilPaseador->update([
+                'identificacion' => $validated['identificacion'],
+                'experiencia_meses' => $validated['experiencia_meses'],
+                'documento_soporte' => $path,
+                'estado' => 'pendiente',
+            ]);
+        } else {
+            // Crear nueva postulación
+            \App\Models\PaseadorPerfil::create([
+                'user_id' => $user->id,
+                'identificacion' => $validated['identificacion'],
+                'experiencia_meses' => $validated['experiencia_meses'],
+                'documento_soporte' => $path,
+                'estado' => 'pendiente',
+                'calificacion_promedio' => 0.0,
+                'porcentaje_recargo' => 0,
+            ]);
+        }
+
+        // Notificar al usuario que se postula
+        $user->notify(new \App\Notifications\SystemNotification(
+            "Tu postulación para ser paseador ha sido recibida y está en revisión.",
+            "postulacion_enviada",
+            route('perfil.editar')
+        ));
+
+        // Notificar a todos los administradores
+        $admins = \App\Models\User::where('rol', 'admin')->get();
+        foreach ($admins as $admin) {
+            $admin->notify(new \App\Notifications\SystemNotification(
+                "Nueva postulación de paseador recibida: {$user->nombres} {$user->apellidos} ha solicitado ser paseador.",
+                "nueva_postulacion",
+                route('admin.paseadores')
+            ));
+        }
+
+        return redirect()->route('perfil.editar')->with('success', '¡Tu postulación para ser paseador ha sido enviada con éxito! Está en espera de aprobación por el administrador.');
+    }
 }

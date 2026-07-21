@@ -24,6 +24,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/paseos/{id}/calificar', [PaseoController::class, 'calificar'])->name('paseos.calificar');
     Route::get('/perfil/editar', [DashboardController::class, 'editarPerfil'])->name('perfil.editar');
     Route::put('/perfil/actualizar', [App\Http\Controllers\ProfileController::class, 'updateCustom'])->name('perfil.actualizar');
+    Route::post('/perfil/postularse', [App\Http\Controllers\ProfileController::class, 'postularse'])->name('perfil.postularse');
 
     // Agendamiento y pagos
     Route::post('/paseos/agendar', [PaseoController::class, 'agendar'])->name('paseos.agendar');
@@ -53,6 +54,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/admin/paseadores/{id}/aprobar', [App\Http\Controllers\AdminController::class, 'aprobar'])->name('admin.paseadores.aprobar');
     Route::post('/admin/paseadores/{id}/rechazar', [App\Http\Controllers\AdminController::class, 'rechazar'])->name('admin.paseadores.rechazar');
     Route::get('/admin/usuarios', [App\Http\Controllers\AdminController::class, 'usuarios'])->name('admin.usuarios');
+    Route::post('/admin/usuarios/{id}/actualizar-rol', [App\Http\Controllers\AdminController::class, 'actualizarRol'])->name('admin.usuarios.actualizar-rol');
+    Route::get('/admin/administradores', [App\Http\Controllers\AdminController::class, 'administradores'])->name('admin.administradores');
     Route::get('/admin/tarifas', [App\Http\Controllers\AdminController::class, 'tarifas'])->name('admin.tarifas');
     Route::post('/admin/tarifas/actualizar', [App\Http\Controllers\AdminController::class, 'actualizarTarifas'])->name('admin.tarifas.actualizar');
     Route::get('/admin/pagos', [App\Http\Controllers\AdminController::class, 'historialPagosGlobal'])->name('admin.pagos.historial');

@@ -13,7 +13,7 @@ class MascotaPolicy
     public function viewAny(User $user): bool
     {
         // Solo propietarios pueden listar mascotas (los admin/paseadores tienen sus propias vistas de auditoría)
-        return $user->rol === 'propietario';
+        return $user->isPropietario();
     }
 
     /**
@@ -22,7 +22,7 @@ class MascotaPolicy
     public function view(User $user, Mascota $mascota): bool
     {
         // El administrador y el dueño de la mascota pueden verla
-        return $user->rol === 'admin' || $user->id === $mascota->propietario_id;
+        return $user->isAdmin() || $user->id === $mascota->propietario_id;
     }
 
     /**
@@ -31,7 +31,7 @@ class MascotaPolicy
     public function create(User $user): bool
     {
         // Solo propietarios pueden registrar mascotas
-        return $user->rol === 'propietario';
+        return $user->isPropietario();
     }
 
     /**

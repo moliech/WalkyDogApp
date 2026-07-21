@@ -90,7 +90,8 @@
 
 <!-- Listado de Auditoría -->
 <div class="bg-white rounded-3xl border border-gray-100 overflow-hidden shadow-sm shadow-gray-100/30">
-    <table class="w-full text-left border-collapse text-sm">
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-sm min-w-[850px]">
         <thead>
             <tr class="bg-slate-50 border-b border-gray-100">
                 <th class="p-4 font-bold text-gray-400 uppercase tracking-wider text-xs">Fecha</th>
@@ -167,6 +168,7 @@
             @endforelse
         </tbody>
     </table>
+    </div>
 </div>
 
 @if($paseos->hasPages())

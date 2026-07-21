@@ -57,7 +57,7 @@ class RegisteredUserController extends Controller
                 'user_id' => $user->id,
                 'identificacion' => 'PENDIENTE-' . $user->id,
                 'experiencia_meses' => 0,
-                'calificacion_promedio' => 5.0,
+                'calificacion_promedio' => 0.0,
                 'estado' => 'pendiente',
             ]);
         }

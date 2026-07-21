@@ -1,11 +1,11 @@
 @extends('layouts.app')
-@section('title', 'Auditoría de Clientes')
+@section('title', 'Auditoría de Administradores')
 
 @section('content')
 <div class="py-6 mb-4 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
     <div>
-        <h2 class="text-3xl font-black text-brand-dark tracking-tight">Auditoría de Clientes</h2>
-        <p class="text-gray-400 font-semibold mt-1">Consulta y gestiona la base de datos de los clientes registrados en el sistema</p>
+        <h2 class="text-3xl font-black text-brand-dark tracking-tight">Auditoría de Administradores</h2>
+        <p class="text-gray-400 font-semibold mt-1">Consulta y gestiona las cuentas administrativas registradas en el sistema</p>
     </div>
     <span class="text-xs font-extrabold px-3 py-1.5 rounded-full bg-brand-primary/10 text-brand-primary uppercase tracking-wider">
         Rol: Administrador
@@ -37,24 +37,24 @@
         </svg>
         Paseadores
     </a>
-    <a href="{{ route('admin.usuarios') }}" class="py-3 px-4 text-sm font-extrabold text-brand-primary border-b-2 border-brand-primary no-underline transition flex items-center gap-1.5">
+    <a href="{{ route('admin.usuarios') }}" class="py-3 px-4 text-sm font-bold text-gray-400 hover:text-brand-primary no-underline transition flex items-center gap-1.5">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z"/>
         </svg>
-        Clientes ({{ $usuarios->count() }})
+        Clientes
     </a>
-    <a href="{{ route('admin.administradores') }}" class="py-3 px-4 text-sm font-bold text-gray-400 hover:text-brand-primary no-underline transition flex items-center gap-1.5">
+    <a href="{{ route('admin.administradores') }}" class="py-3 px-4 text-sm font-extrabold text-brand-primary border-b-2 border-brand-primary no-underline transition flex items-center gap-1.5">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
         </svg>
-        Administradores
+        Administradores ({{ $administradores->count() }})
     </a>
 </div>
 
 <div class="space-y-6">
     <div>
         <h4 class="text-lg font-black text-brand-dark mb-4 flex items-center gap-2">
-            <span>Clientes Registrados</span>
+            <span>Administradores del Sistema</span>
         </h4>
         
         <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
@@ -62,46 +62,40 @@
                 <table class="w-full text-left border-collapse text-sm min-w-[800px]">
                     <thead>
                         <tr class="bg-slate-50 border-b border-gray-100">
-                            <th class="p-4 font-bold text-gray-400 uppercase tracking-wider text-xs">Cliente</th>
+                            <th class="p-4 font-bold text-gray-400 uppercase tracking-wider text-xs">Administrador</th>
                             <th class="p-4 font-bold text-gray-400 uppercase tracking-wider text-xs">Teléfono</th>
                             <th class="p-4 font-bold text-gray-400 uppercase tracking-wider text-xs">Dirección</th>
-                            <th class="p-4 font-bold text-gray-400 uppercase tracking-wider text-xs text-center">Mascotas</th>
                             <th class="p-4 font-bold text-gray-400 uppercase tracking-wider text-xs">Registro</th>
                             <th class="p-4 font-bold text-gray-400 uppercase tracking-wider text-xs text-right">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($usuarios as $usuario)
+                        @forelse($administradores as $admin)
                             <tr class="border-b border-gray-50 hover:bg-slate-50/30 transition">
                                 <td class="p-4">
-                                    <span class="font-extrabold text-brand-dark block">{{ $usuario->nombres }} {{ $usuario->apellidos }}</span>
-                                    <span class="text-xs text-gray-400 font-semibold">{{ $usuario->email }}</span>
+                                    <span class="font-extrabold text-brand-dark block">{{ $admin->nombres }} {{ $admin->apellidos }}</span>
+                                    <span class="text-xs text-gray-400 font-semibold">{{ $admin->email }}</span>
                                 </td>
-                                <td class="p-4 font-bold text-gray-500">{{ $usuario->telefono ?? 'No registrado' }}</td>
-                                <td class="p-4 text-gray-500 font-semibold">{{ $usuario->direccion }}</td>
-                                <td class="p-4 text-center">
-                                    @if($usuario->mascotas_count > 0)
-                                        <span class="text-xs font-black px-3 py-1 rounded-full bg-brand-secondary/15 text-brand-secondary">
-                                            {{ $usuario->mascotas_count }}
-                                        </span>
-                                    @else
-                                        <span class="text-xs font-extrabold px-3 py-1 rounded-full bg-gray-100 text-gray-400">
-                                            Ninguna
-                                        </span>
-                                    @endif
-                                </td>
+                                <td class="p-4 font-bold text-gray-500">{{ $admin->telefono ?? 'No registrado' }}</td>
+                                <td class="p-4 text-gray-500 font-semibold">{{ $admin->direccion }}</td>
                                 <td class="p-4 text-xs font-bold text-gray-400">
-                                    {{ \Carbon\Carbon::parse($usuario->created_at)->format('d/m/Y g:i A') }}
+                                    {{ \Carbon\Carbon::parse($admin->created_at)->format('d/m/Y g:i A') }}
                                 </td>
                                 <td class="p-4 text-right">
-                                    <button onclick="openEditRoleModal('{{ $usuario->id }}', '{{ $usuario->nombres }} {{ $usuario->apellidos }}', '{{ $usuario->rol }}')" class="bg-brand-primary/5 hover:bg-brand-primary text-brand-primary hover:text-white font-bold text-xs px-3 py-1.5 rounded-lg transition border-0 cursor-pointer">
-                                        Asignar Rol
-                                    </button>
+                                    @if($admin->id !== auth()->id())
+                                        <button onclick="openEditRoleModal('{{ $admin->id }}', '{{ $admin->nombres }} {{ $admin->apellidos }}', '{{ $admin->rol }}')" class="bg-brand-primary/5 hover:bg-brand-primary text-brand-primary hover:text-white font-bold text-xs px-3 py-1.5 rounded-lg transition border-0 cursor-pointer">
+                                            Asignar Rol
+                                        </button>
+                                    @else
+                                        <span class="text-xs font-extrabold text-gray-400 px-3 py-1.5 bg-gray-100 rounded-lg select-none">
+                                            Tú (Actual)
+                                        </span>
+                                    @endif
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="p-8 text-center text-gray-400 italic">No hay clientes registrados en el sistema.</td>
+                                <td colspan="5" class="p-8 text-center text-gray-400 italic">No hay administradores registrados en el sistema.</td>
                             </tr>
                         @endforelse
                     </tbody>

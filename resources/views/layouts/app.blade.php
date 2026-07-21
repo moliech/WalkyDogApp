@@ -23,13 +23,13 @@
                 <ul class="flex flex-col lg:flex-row items-center lg:ml-auto space-y-3 lg:space-y-0 lg:space-x-1.5 list-none pl-0 mb-0">
                     <li><a class="block text-sm font-bold px-4 py-2 rounded-xl transition duration-200 no-underline {{ request()->routeIs('dashboard') ? 'bg-brand-primary/10 text-brand-primary' : 'text-gray-600 hover:text-brand-primary hover:bg-brand-primary/5' }}" href="{{ route('dashboard') }}">Dashboard</a></li>
                     
-                    @if(auth()->check() && !auth()->user()->perfilPaseador && !auth()->user()->isAdmin())
+                    @if(auth()->check() && auth()->user()->isPropietario())
                         <li><a class="block text-sm font-bold px-4 py-2 rounded-xl transition duration-200 no-underline {{ request()->routeIs('mascotas.*') ? 'bg-brand-primary/10 text-brand-primary' : 'text-gray-600 hover:text-brand-primary hover:bg-brand-primary/5' }}" href="{{ route('mascotas.index') }}">Mis Mascotas</a></li>
                         <li><a class="block text-sm font-bold px-4 py-2 rounded-xl transition duration-200 no-underline {{ request()->routeIs('paseos.monitoreo') ? 'bg-brand-primary/10 text-brand-primary' : 'text-gray-600 hover:text-brand-primary hover:bg-brand-primary/5' }}" href="{{ route('paseos.monitoreo') }}">Monitoreo</a></li>
                         <li><a class="block text-sm font-bold px-4 py-2 rounded-xl transition duration-200 no-underline {{ request()->routeIs('pagos.historial') ? 'bg-brand-primary/10 text-brand-primary' : 'text-gray-600 hover:text-brand-primary hover:bg-brand-primary/5' }}" href="{{ route('pagos.historial') }}">Historial de Pagos</a></li>
                     @endif
 
-                    @if(auth()->check() && auth()->user()->perfilPaseador && !auth()->user()->isAdmin())
+                    @if(auth()->check() && auth()->user()->isPaseador())
                         <li><a class="block text-sm font-bold px-4 py-2 rounded-xl transition duration-200 no-underline {{ request()->routeIs('paseos.control') ? 'bg-brand-primary/10 text-brand-primary' : 'text-gray-600 hover:text-brand-primary hover:bg-brand-primary/5' }}" href="{{ route('paseos.control') }}">Paseador</a></li>
                         <li><a class="block text-sm font-bold px-4 py-2 rounded-xl transition duration-200 no-underline {{ request()->routeIs('paseos.monitoreo') ? 'bg-brand-primary/10 text-brand-primary' : 'text-gray-600 hover:text-brand-primary hover:bg-brand-primary/5' }}" href="{{ route('paseos.monitoreo') }}">Monitoreo</a></li>
                     @endif
@@ -62,7 +62,7 @@
                         </li>
                     @endif
                     
-                    @if(auth()->check() && !auth()->user()->perfilPaseador && !auth()->user()->isAdmin())
+                    @if(auth()->check() && auth()->user()->isPropietario())
                         <li class="w-full lg:w-auto mt-2 lg:mt-0">
                             <button class="w-full lg:w-auto bg-brand-primary hover:bg-brand-primary-hover text-white font-bold text-sm px-5 py-2.5 rounded-xl shadow-sm hover:shadow-lg hover:shadow-brand-primary/20 hover:-translate-y-0.5 transition duration-200 cursor-pointer flex items-center justify-center gap-1.5" data-bs-toggle="modal" data-bs-target="#solicitarPaseoModal">
                                 <svg class="w-4 h-4 inline-block" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
@@ -130,7 +130,19 @@
                                 @endif
                             </div>
                         </div>
-                    </li>
+                    <!-- Selector de Roles Simulados para Sustentación -->
+                    @if(auth()->user()->rol === 'admin')
+                        <li class="w-full lg:w-auto mt-2 lg:mt-0 flex items-center justify-center lg:px-2">
+                            <form id="role-switcher-form" method="POST" action="{{ route('role.switch') }}" class="inline-flex items-center">
+                                @csrf
+                                <select name="simulated_role" onchange="document.getElementById('role-switcher-form').submit()" class="text-xs font-black rounded-xl border border-gray-200 px-3 py-2.5 focus:border-brand-primary outline-none bg-slate-50 text-brand-dark cursor-pointer shadow-sm">
+                                    <option value="propietario" {{ (session('simulated_role') ?? auth()->user()->rol) === 'propietario' ? 'selected' : '' }}>Vista: Propietario</option>
+                                    <option value="paseador" {{ (session('simulated_role') ?? auth()->user()->rol) === 'paseador' ? 'selected' : '' }}>Vista: Paseador</option>
+                                    <option value="admin" {{ (session('simulated_role') ?? auth()->user()->rol) === 'admin' ? 'selected' : '' }}>Vista: Administrador</option>
+                                </select>
+                            </form>
+                        </li>
+                    @endif
 
                     <li class="w-full lg:w-auto mt-2 lg:mt-0 lg:border-l lg:border-gray-200 lg:pl-3">
                         <a class="w-full lg:w-auto inline-block text-center border font-bold text-sm px-5 py-2.5 rounded-xl transition duration-200 no-underline flex items-center justify-center gap-1.5 {{ request()->routeIs('perfil.editar') ? 'bg-brand-primary text-white border-brand-primary shadow-md' : 'border-gray-200 text-brand-dark hover:border-brand-primary hover:text-brand-primary' }}" href="{{ route('perfil.editar') }}">
@@ -439,10 +451,10 @@
             if (input && icon) {
                 if (input.type === 'password') {
                     input.type = 'text';
-                    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d=\"M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a10.024 10.024 0 014.168-5.263M13.875 18.825l3.524 3.524m-3.524-3.524a8 8 0 11-8-8L12 12m4.88-4.88a9.961 9.961 0 014.662 4.88c-1.274 4.057-5.064 7-9.542 7-1.447 0-2.825-.303-4.08-.853m0 0L7.12 7.12m0 0A8.003 8.003 0 0112 4c4.478 0 8.268 2.943 9.542 7a10.025 10.025 0 01-2.224 3.618\"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d=\"M3 3l18 18\"></path>';
+                    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88"></path>';
                 } else {
                     input.type = 'password';
-                    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d=\"M15 12a3 3 0 11-6 0 3 3 0 016 0z\"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d=\"M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z\"></path>';
+                    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>';
                 }
             }
         }

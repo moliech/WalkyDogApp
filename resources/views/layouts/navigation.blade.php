@@ -21,14 +21,16 @@
             <!-- Settings Dropdown -->
             <div class="hidden sm:flex sm:items-center sm:ms-6 gap-4">
                 <!-- Selector de Roles Simulados para Sustentación -->
-                <form id="role-switcher-form" method="POST" action="{{ route('role.switch') }}" class="inline-flex items-center">
-                    @csrf
-                    <select name="simulated_role" onchange="document.getElementById('role-switcher-form').submit()" class="text-xs font-black rounded-xl border border-gray-200 px-3 py-1.5 focus:border-brand-primary outline-none bg-slate-50 text-brand-dark cursor-pointer shadow-sm">
-                        <option value="propietario" {{ (session('simulated_role') ?? auth()->user()->rol) === 'propietario' ? 'selected' : '' }}>Vista: Propietario</option>
-                        <option value="paseador" {{ (session('simulated_role') ?? auth()->user()->rol) === 'paseador' ? 'selected' : '' }}>Vista: Paseador</option>
-                        <option value="admin" {{ (session('simulated_role') ?? auth()->user()->rol) === 'admin' ? 'selected' : '' }}>Vista: Administrador</option>
-                    </select>
-                </form>
+                @if(auth()->user()->rol === 'admin')
+                    <form id="role-switcher-form" method="POST" action="{{ route('role.switch') }}" class="inline-flex items-center">
+                        @csrf
+                        <select name="simulated_role" onchange="document.getElementById('role-switcher-form').submit()" class="text-xs font-black rounded-xl border border-gray-200 px-3 py-1.5 focus:border-brand-primary outline-none bg-slate-50 text-brand-dark cursor-pointer shadow-sm">
+                            <option value="propietario" {{ (session('simulated_role') ?? auth()->user()->rol) === 'propietario' ? 'selected' : '' }}>Vista: Propietario</option>
+                            <option value="paseador" {{ (session('simulated_role') ?? auth()->user()->rol) === 'paseador' ? 'selected' : '' }}>Vista: Paseador</option>
+                            <option value="admin" {{ (session('simulated_role') ?? auth()->user()->rol) === 'admin' ? 'selected' : '' }}>Vista: Administrador</option>
+                        </select>
+                    </form>
+                @endif
 
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
@@ -90,14 +92,16 @@
                     <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
                 </div>
                 <!-- Selector de Roles Móvil -->
-                <form id="role-switcher-form-mobile" method="POST" action="{{ route('role.switch') }}">
-                    @csrf
-                    <select name="simulated_role" onchange="document.getElementById('role-switcher-form-mobile').submit()" class="text-xs font-black rounded-xl border border-gray-200 px-3 py-1.5 focus:border-brand-primary outline-none bg-slate-50 text-brand-dark cursor-pointer shadow-sm">
-                        <option value="propietario" {{ (session('simulated_role') ?? auth()->user()->rol) === 'propietario' ? 'selected' : '' }}>Propietario</option>
-                        <option value="paseador" {{ (session('simulated_role') ?? auth()->user()->rol) === 'paseador' ? 'selected' : '' }}>Paseador</option>
-                        <option value="admin" {{ (session('simulated_role') ?? auth()->user()->rol) === 'admin' ? 'selected' : '' }}>Admin</option>
-                    </select>
-                </form>
+                @if(auth()->user()->rol === 'admin')
+                    <form id="role-switcher-form-mobile" method="POST" action="{{ route('role.switch') }}">
+                        @csrf
+                        <select name="simulated_role" onchange="document.getElementById('role-switcher-form-mobile').submit()" class="text-xs font-black rounded-xl border border-gray-200 px-3 py-1.5 focus:border-brand-primary outline-none bg-slate-50 text-brand-dark cursor-pointer shadow-sm">
+                            <option value="propietario" {{ (session('simulated_role') ?? auth()->user()->rol) === 'propietario' ? 'selected' : '' }}>Propietario</option>
+                            <option value="paseador" {{ (session('simulated_role') ?? auth()->user()->rol) === 'paseador' ? 'selected' : '' }}>Paseador</option>
+                            <option value="admin" {{ (session('simulated_role') ?? auth()->user()->rol) === 'admin' ? 'selected' : '' }}>Admin</option>
+                        </select>
+                    </form>
+                @endif
             </div>
 
             <div class="mt-3 space-y-1">

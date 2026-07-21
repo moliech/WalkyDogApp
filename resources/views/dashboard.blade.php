@@ -142,7 +142,7 @@
             <span>Rastreo de Paseos Activos en Curso</span>
         </h4>
         <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse text-sm">
+            <table class="w-full text-left border-collapse text-sm min-w-[600px]">
                 <thead>
                     <tr class="bg-slate-50 border-b border-slate-100">
                         <th class="p-3 font-bold text-gray-400 uppercase tracking-wider text-xs">Paseo ID</th>
@@ -198,7 +198,7 @@
             <span>Registro de Mascotas Propias</span>
         </h4>
         <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse text-sm">
+            <table class="w-full text-left border-collapse text-sm min-w-[600px]">
                 <thead>
                     <tr class="bg-slate-50 border-b border-slate-100">
                         <th class="p-3 font-bold text-gray-400 uppercase tracking-wider text-xs">ID</th>
@@ -238,7 +238,7 @@
             <span>Paseadores Activos Disponibles</span>
         </h4>
         <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse text-sm">
+            <table class="w-full text-left border-collapse text-sm min-w-[600px]">
                 <thead>
                     <tr class="bg-slate-50 border-b border-slate-100">
                         <th class="p-3 font-bold text-gray-400 uppercase tracking-wider text-xs">Nombre</th>
@@ -281,7 +281,7 @@
             <span>Historial de Incidentes y Novedades</span>
         </h4>
         <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse text-sm">
+            <table class="w-full text-left border-collapse text-sm min-w-[600px]">
                 <thead>
                     <tr class="bg-slate-50 border-b border-slate-100">
                         <th class="p-3 font-bold text-gray-400 uppercase tracking-wider text-xs">Paseo ID</th>
@@ -376,7 +376,7 @@
             height: 192,
             type: "svg",
             data: token,
-            image: "/images/walkydog_logo.jpg",
+            image: "/images/paw.svg",
             dotsOptions: {
                 color: "#d35400",
                 type: "rounded"
