@@ -20,9 +20,20 @@ php artisan view:cache
 # Enlace simbólico para storage
 php artisan storage:link --force || true
 
-# Ejecutar migraciones y poblar la base de datos automáticamente
-echo "Ejecutando migraciones y seeders de base de datos..."
-php artisan migrate:fresh --seed --force
+# Ejecutar migraciones
+echo "Ejecutando migraciones de base de datos..."
+php artisan migrate --force
+
+# Opcional: Sembrar base de datos si no hay usuarios registrados
+USER_COUNT=$(php artisan tinker --execute="echo \App\Models\User::count();" 2>/dev/null || echo "0")
+USER_COUNT=$(echo "$USER_COUNT" | tr -d '\r\n[:space:]')
+
+if [ "$USER_COUNT" = "0" ] || [ -z "$USER_COUNT" ]; then
+    echo "Base de datos vacía o primer inicio. Sembrando datos iniciales..."
+    php artisan db:seed --force
+else
+    echo "La base de datos ya contiene datos ($USER_COUNT usuarios). Saltando db:seed."
+fi
 
 # Iniciar PHP-FPM en segundo plano
 php-fpm -D
