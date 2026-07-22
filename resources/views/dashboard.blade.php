@@ -18,6 +18,15 @@
     </div>
 @endif
 
+@if(session('error'))
+    <div class="bg-red-50 border border-red-100 text-red-800 p-4 rounded-2xl font-bold text-sm mb-6 flex items-center gap-2">
+        <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"/>
+        </svg>
+        {{ session('error') }}
+    </div>
+@endif
+
 @if($paseosPorCalificar->isNotEmpty())
     <div class="mb-8 space-y-4">
         @foreach($paseosPorCalificar as $pc)

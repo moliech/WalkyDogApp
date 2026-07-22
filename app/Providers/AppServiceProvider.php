@@ -46,7 +46,7 @@ class AppServiceProvider extends ServiceProvider
                 $user = auth()->user();
 
                 if (!$user->isAdmin()) {
-                    $view->with('myPets', Mascota::where('propietario_id', $user->id)->get());
+                    $view->with('myPets', Mascota::where('propietario_id', $user->id)->with('paseos')->get());
                     $view->with('activeWalkers', User::whereHas('perfilPaseador', function ($query) {
                         $query->where('estado', 'activo');
                     })->get());

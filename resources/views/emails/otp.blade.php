@@ -25,7 +25,7 @@
         </tr>
         <tr>
             <td style="background-color: #f1f5f9; padding: 15px; text-align: center; font-size: 11px; color: #94a3b8;">
-                &copy; 2026 WalkyDog App - Seminario RAD Cotecnova.
+                &copy; {{ date('Y') }} WalkyDog App. Todos los derechos reservados.
             </td>
         </tr>
     </table>

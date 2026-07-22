@@ -27,12 +27,24 @@ class PaseoController extends Controller
             return redirect()->route('login');
         }
 
+        $selectedPaseadorId = $request->query('paseador_id');
+        $todosPaseadores = collect();
+
         // Cargar paseos activos según el rol
         if ($user->isAdmin()) {
-            // El Administrador ve todos los paseos activos del sistema
-            $paseosActivos = Paseo::with(['mascota', 'paseador', 'ubicaciones', 'novedades'])
+            // Todos los paseos activos sin filtrar (para poblar el selector de paseadores únicos)
+            $todosPaseosActivos = Paseo::with(['mascota', 'paseador', 'ubicaciones', 'novedades'])
                 ->where('estado', 'en_progreso')
                 ->get();
+
+            $todosPaseadores = $todosPaseosActivos->pluck('paseador')->unique('id')->values();
+
+            // Si hay un filtro de paseador seleccionado
+            if ($selectedPaseadorId && $selectedPaseadorId !== 'all') {
+                $paseosActivos = $todosPaseosActivos->where('paseador_id', (int)$selectedPaseadorId)->values();
+            } else {
+                $paseosActivos = $todosPaseosActivos;
+            }
         } elseif ($user->isPaseador()) {
             // El Paseador ve los paseos activos que él está realizando
             $paseosActivos = Paseo::with(['mascota', 'paseador', 'ubicaciones', 'novedades'])
@@ -54,16 +66,16 @@ class PaseoController extends Controller
         if ($paseosActivos->isNotEmpty()) {
             $selectedId = $request->query('paseo_id');
             $paseoActivo = $selectedId 
-                ? $paseosActivos->firstWhere('id', $selectedId) 
+                ? $paseosActivos->firstWhere('id', (int)$selectedId) 
                 : $paseosActivos->first();
 
-            // Si el ID seleccionado no pertenece al listado autorizado, cargamos el primero
+            // Si el ID seleccionado no pertenece al listado filtrado, cargamos el primero disponible
             if (!$paseoActivo) {
                 $paseoActivo = $paseosActivos->first();
             }
         }
 
-        return view('paseos.monitoreo', compact('paseosActivos', 'paseoActivo'));
+        return view('paseos.monitoreo', compact('paseosActivos', 'paseoActivo', 'todosPaseadores', 'selectedPaseadorId'));
     }
 
     /**
@@ -108,6 +120,11 @@ class PaseoController extends Controller
         $mascota = Mascota::findOrFail($request->mascota_id);
         if ($mascota->propietario_id !== auth()->id()) {
             abort(403, 'No tienes autorización para agendar un paseo para esta mascota.');
+        }
+
+        // 1.b Validamos que la mascota no se encuentre ya en un paseo activo o pendiente
+        if ($mascota->tienePaseoActivo()) {
+            return back()->with('error', "La mascota '{$mascota->nombre}' ya tiene un paseo activo o una solicitud pendiente de confirmación.");
         }
 
         // 2. Creamos el paseo en estado 'pendiente' (Espera de aceptación)
@@ -483,6 +500,18 @@ class PaseoController extends Controller
         $paseo->update([
             'estado' => 'cancelado',
         ]);
+
+        // Notificar al propietario en pantalla sobre el rechazo
+        $paseo->load(['mascota.propietario', 'paseador']);
+        $propietarioUser = $paseo->mascota->propietario;
+        if ($propietarioUser) {
+            $propietarioUser->notify(new PaseoNotification(
+                $paseo,
+                "Tu solicitud de paseo para {$paseo->mascota->nombre} ha sido rechazada por el paseador {$paseo->paseador->nombres}.",
+                'rechazado',
+                route('dashboard', [], false)
+            ));
+        }
 
         return redirect()->route('paseos.control')
             ->with('success', 'Has rechazado la solicitud de paseo.');

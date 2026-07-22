@@ -293,7 +293,9 @@
                             <select name="mascota_id" required class="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 transition duration-200 outline-none text-brand-dark bg-white">
                                 @isset($myPets)
                                     @forelse($myPets as $pet)
-                                        <option value="{{ $pet->id }}">{{ $pet->nombre }} ({{ $pet->raza }})</option>
+                                        <option value="{{ $pet->id }}" @if($pet->tienePaseoActivo()) disabled class="bg-gray-100 text-gray-400" @endif>
+                                            {{ $pet->nombre }} ({{ $pet->raza }})@if($pet->tienePaseoActivo()) — ⚠️ En paseo activo / pendiente @endif
+                                        </option>
                                     @empty
                                         <option value="">No tienes mascotas registradas</option>
                                     @endforelse

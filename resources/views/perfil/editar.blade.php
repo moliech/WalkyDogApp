@@ -200,7 +200,7 @@
             </div>
         </form>
 
-        @if(!$usuario['es_paseador'])
+        @if(!auth()->user()->isAdmin() && auth()->user()->rol !== 'admin' && !$usuario['es_paseador'])
             <div class="mt-8 pt-8 border-t border-gray-100">
                 @if(empty($usuario['estado_paseador']))
                     <!-- Nunca se ha postulado -->

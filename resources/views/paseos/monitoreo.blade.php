@@ -22,10 +22,10 @@
     <div class="mb-6 bg-slate-50 p-4 rounded-2xl border border-slate-100 flex flex-col sm:flex-row items-center gap-4 justify-between">
         <div class="flex items-center gap-2">
             <span class="text-sm font-bold text-brand-dark">Filtrar por Paseador:</span>
-            <select id="filter-paseador" class="rounded-xl border border-gray-200 px-3 py-2 text-xs focus:border-brand-primary outline-none bg-white font-extrabold text-brand-dark" onchange="filterWalksByWalker()">
-                <option value="all">Todos los Paseadores</option>
-                @foreach($paseosActivos->pluck('paseador')->unique('id') as $walker)
-                    <option value="walker-{{ $walker->id }}">{{ $walker->nombres }} {{ $walker->apellidos }}</option>
+            <select id="filter-paseador" class="rounded-xl border border-gray-200 px-3 py-2 text-xs focus:border-brand-primary outline-none bg-white font-extrabold text-brand-dark" onchange="filterWalksByWalker(this.value)">
+                <option value="all" @if(empty($selectedPaseadorId) || $selectedPaseadorId === 'all') selected @endif>Todos los Paseadores</option>
+                @foreach($todosPaseadores as $walker)
+                    <option value="{{ $walker->id }}" @if($selectedPaseadorId == $walker->id) selected @endif>{{ $walker->nombres }} {{ $walker->apellidos }}</option>
                 @endforeach
             </select>
         </div>
@@ -33,12 +33,17 @@
     </div>
     @endif
 
-    @if($paseosActivos->count() > 1)
+    @if($paseosActivos->count() > 0)
     <div class="flex flex-wrap gap-2 mb-6">
         <span class="text-xs font-bold text-gray-400 uppercase tracking-wider w-full mb-1">Mascotas en Paseo (Selecciona una para monitorear)</span>
         @foreach($paseosActivos as $pa)
-            <a href="{{ route('paseos.monitoreo', ['paseo_id' => $pa->id]) }}" 
-               data-walker-id="walker-{{ $pa->paseador_id }}"
+            @php
+                $queryParams = ['paseo_id' => $pa->id];
+                if (!empty($selectedPaseadorId) && $selectedPaseadorId !== 'all') {
+                    $queryParams['paseador_id'] = $selectedPaseadorId;
+                }
+            @endphp
+            <a href="{{ route('paseos.monitoreo', $queryParams) }}" 
                class="walk-tab-item px-4 py-2.5 rounded-xl text-sm font-extrabold transition no-underline flex items-center gap-1.5
                       {{ $paseoActivo->id == $pa->id ? 'bg-brand-primary text-white shadow-md shadow-brand-primary/20' : 'bg-white border border-gray-100 text-gray-500 hover:text-brand-primary hover:bg-brand-primary/5' }}">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -283,16 +288,17 @@
         setInterval(refreshTrackingData, 15000);
     });
 
-    // Función de filtrado dinámico para la vista del Administrador
-    window.filterWalksByWalker = function() {
-        const selected = document.getElementById('filter-paseador').value;
-        document.querySelectorAll('.walk-tab-item').forEach(item => {
-            if (selected === 'all' || item.getAttribute('data-walker-id') === selected) {
-                item.style.display = '';
-            } else {
-                item.style.display = 'none';
-            }
-        });
+    // Función de filtrado para la vista del Administrador
+    window.filterWalksByWalker = function(walkerId) {
+        const url = new URL(window.location.href);
+        if (walkerId && walkerId !== 'all') {
+            url.searchParams.set('paseador_id', walkerId);
+            url.searchParams.delete('paseo_id');
+        } else {
+            url.searchParams.delete('paseador_id');
+            url.searchParams.delete('paseo_id');
+        }
+        window.location.href = url.toString();
     }
 </script>
 @endif

@@ -35,4 +35,20 @@ class Mascota extends Model
     {
         return $query->where('tamano', $tamano);
     }
+
+    /**
+     * Determina si la mascota tiene un paseo activo o pendiente en curso.
+     */
+    public function tienePaseoActivo()
+    {
+        if ($this->relationLoaded('paseos')) {
+            return $this->paseos
+                ->whereIn('estado', ['pendiente', 'esperando_pago', 'programado', 'en_progreso'])
+                ->isNotEmpty();
+        }
+
+        return $this->paseos()
+            ->whereIn('estado', ['pendiente', 'esperando_pago', 'programado', 'en_progreso'])
+            ->exists();
+    }
 }

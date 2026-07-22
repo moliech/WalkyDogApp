@@ -48,47 +48,52 @@
 <!-- Listado en Rejilla -->
 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
     @forelse($mascotas as $mascota)
-        <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-lg hover:-translate-y-1 transition duration-300 flex flex-col h-full">
-            <div class="bg-gradient-to-br from-brand-primary/5 to-brand-primary/10 h-32 flex items-center justify-center border-b border-gray-100">
-                <!-- Icono SVG de huella o perro limpio en lugar de emojis -->
-                <svg class="w-12 h-12 text-brand-primary" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.182 15.182a4.5 4.5 0 0 1-6.364 0M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0ZM9.75 9.75c0 .414-.168.75-.375.75S9 10.164 9 9.75 9.168 9 9.375 9s.375.336.375.75Zm-.375 0h.008v.015h-.008V9.75Zm5.625 0c0 .414-.168.75-.375.75s-.375-.336-.375-.75.168-.75.375-.75.375.336.375.75Zm-.375 0h.008v.015h-.008V9.75Z"/>
-                </svg>
-            </div>
-            <div class="p-6 flex-1 flex flex-col justify-between">
-                <div>
-                    <h5 class="text-lg font-black text-brand-dark mb-1">{{ $mascota->nombre }}</h5>
-                    <p class="text-xs text-gray-400 mb-4">{{ $mascota->observaciones ?? 'Sin observaciones' }}</p>
-                </div>
-                
-                <div class="space-y-2 mb-4">
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Raza:</span>
-                        <span class="text-sm font-extrabold text-brand-dark">{{ $mascota->raza }}</span>
+        <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition duration-300 flex flex-col justify-between h-full">
+            <div>
+                <!-- Encabezado de la Mascota -->
+                <div class="flex items-start justify-between gap-3 mb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-brand-primary/10 flex items-center justify-center shrink-0">
+                            <svg class="w-5 h-5 text-brand-primary" viewBox="0 0 100 100" fill="currentColor">
+                                <path d="M 50 43 C 35 43, 26 56, 28 70 C 30 82, 42 86, 50 86 C 58 86, 70 82, 72 70 C 74 56, 65 43, 50 43 Z"/>
+                                <circle cx="24" cy="42" r="9"/>
+                                <circle cx="39" cy="24" r="10.5"/>
+                                <circle cx="61" cy="24" r="10.5"/>
+                                <circle cx="76" cy="42" r="9"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h5 class="text-base font-black text-brand-dark leading-tight">{{ $mascota->nombre }}</h5>
+                            <span class="text-xs font-bold text-gray-400 block mt-0.5">{{ $mascota->raza }}</span>
+                        </div>
                     </div>
-                    
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Tamaño:</span>
-                        <span class="text-xs font-extrabold px-3 py-1 rounded-full inline-block @if($mascota->tamano == 'Grande') bg-brand-primary/10 text-brand-primary @elseif($mascota->tamano == 'Pequeño') bg-brand-secondary/15 text-brand-secondary @else bg-amber-400/10 text-amber-500 @endif">
-                            {{ $mascota->tamano }}
-                        </span>
-                    </div>
+                    <span class="text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full shrink-0 @if($mascota->tamano == 'Grande') bg-brand-primary/10 text-brand-primary @elseif($mascota->tamano == 'Pequeño') bg-brand-secondary/15 text-brand-secondary @else bg-amber-400/10 text-amber-600 @endif">
+                        {{ $mascota->tamano }}
+                    </span>
                 </div>
 
-                <!-- Botones de Acción sin emojis -->
-                <div class="flex items-center gap-2 pt-4 border-t border-gray-100">
-                    <a href="{{ route('mascotas.edit', $mascota->id) }}" class="flex-1 text-center bg-gray-50 hover:bg-gray-100 border border-gray-200 text-brand-dark font-bold text-xs py-2.5 rounded-lg no-underline transition">
-                        Editar
-                    </a>
-                    
-                    <form action="{{ route('mascotas.destroy', $mascota->id) }}" method="POST" class="flex-1" onsubmit="return confirm('¿Estás seguro de eliminar a esta mascota?')">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="w-full bg-brand-accent-red/10 hover:bg-brand-accent-red hover:text-white border border-brand-accent-red/25 text-brand-accent-red font-bold text-xs py-2.5 rounded-lg transition cursor-pointer">
-                            Eliminar
-                        </button>
-                    </form>
+                <!-- Observaciones -->
+                <div class="mb-4">
+                    <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Observaciones</span>
+                    <p class="text-xs text-gray-600 font-semibold leading-relaxed bg-slate-50 p-3 rounded-xl border border-slate-100/80 min-h-[42px] flex items-center">
+                        {{ $mascota->observaciones ?? 'Sin observaciones registradas' }}
+                    </p>
                 </div>
+            </div>
+
+            <!-- Botones de Acción -->
+            <div class="flex items-center gap-2 pt-4 border-t border-gray-100">
+                <a href="{{ route('mascotas.edit', $mascota->id) }}" class="flex-1 text-center bg-gray-50 hover:bg-gray-100 border border-gray-200 text-brand-dark font-bold text-xs py-2.5 rounded-xl no-underline transition">
+                    Editar
+                </a>
+                
+                <form action="{{ route('mascotas.destroy', $mascota->id) }}" method="POST" class="flex-1" onsubmit="return confirm('¿Estás seguro de eliminar a esta mascota?')">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="w-full bg-brand-accent-red/10 hover:bg-brand-accent-red hover:text-white border border-brand-accent-red/25 text-brand-accent-red font-bold text-xs py-2.5 rounded-xl transition cursor-pointer">
+                        Eliminar
+                    </button>
+                </form>
             </div>
         </div>
     @empty
