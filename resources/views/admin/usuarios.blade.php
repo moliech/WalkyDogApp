@@ -108,6 +108,12 @@
                 </table>
             </div>
         </div>
+
+        @if($usuarios->hasPages())
+            <div class="mt-6 bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
+                {{ $usuarios->links() }}
+            </div>
+        @endif
     </div>
 </div>
 

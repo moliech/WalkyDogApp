@@ -96,11 +96,11 @@ class AdminController extends Controller
             abort(403, 'Acceso restringido únicamente para administradores del sistema.');
         }
 
-        // Obtener dueños/propietarios
+        // Obtener dueños/propietarios paginados
         $usuarios = \App\Models\User::where('rol', 'propietario')
             ->withCount('mascotas')
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->paginate(10);
 
         return view('admin.usuarios', compact('usuarios'));
     }

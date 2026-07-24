@@ -7,7 +7,28 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')
 </head>
-<body class="bg-brand-bg font-sans antialiased text-brand-dark">
+<body class="bg-brand-bg font-sans antialiased text-brand-dark relative overflow-x-hidden min-h-screen">
+
+    <!-- Fondo de Líneas y Ondas Topográficas Vectoriales (Topography Contour Waves) -->
+    <div class="fixed inset-0 pointer-events-none z-0 opacity-70 overflow-hidden">
+        <svg class="w-full h-full text-brand-primary" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" fill="none" stroke="currentColor" stroke-width="1.5">
+            <!-- Ondas de la Esquina Superior Derecha -->
+            <path d="M 900 -100 C 1100 100, 1300 200, 1500 50" stroke="rgba(224, 122, 95, 0.14)" />
+            <path d="M 850 -100 C 1080 120, 1280 240, 1500 100" stroke="rgba(224, 122, 95, 0.12)" />
+            <path d="M 800 -100 C 1050 140, 1250 280, 1500 150" stroke="rgba(224, 122, 95, 0.10)" />
+            <path d="M 750 -100 C 1020 160, 1220 320, 1500 200" stroke="rgba(224, 122, 95, 0.08)" />
+
+            <!-- Ondas Centrales Fluídas -->
+            <path d="M -100 300 C 300 150, 700 450, 1500 200" stroke="rgba(255, 140, 50, 0.12)" />
+            <path d="M -100 360 C 320 210, 720 510, 1500 260" stroke="rgba(255, 140, 50, 0.10)" />
+            <path d="M -100 420 C 340 270, 740 570, 1500 320" stroke="rgba(255, 140, 50, 0.08)" />
+
+            <!-- Ondas de la Esquina Inferior Izquierda -->
+            <path d="M -100 600 C 200 750, 500 800, 800 1000" stroke="rgba(129, 178, 154, 0.18)" stroke-width="2" />
+            <path d="M -100 660 C 220 800, 520 840, 830 1000" stroke="rgba(129, 178, 154, 0.14)" stroke-width="2" />
+            <path d="M -100 720 C 240 850, 540 880, 860 1000" stroke="rgba(129, 178, 154, 0.10)" />
+        </svg>
+    </div>
 
     <nav class="navbar navbar-expand-lg bg-white/85 backdrop-blur-md sticky top-0 z-50 border-b border-gray-100 py-3.5">
         <div class="container mx-auto px-4 md:px-6 flex flex-wrap items-center justify-between">
@@ -146,12 +167,11 @@
 
                     <li class="w-full lg:w-auto mt-2 lg:mt-0 lg:border-l lg:border-gray-200 lg:pl-3">
                         <a class="w-full lg:w-auto inline-block text-center border font-bold text-sm px-5 py-2.5 rounded-xl transition duration-200 no-underline flex items-center justify-center gap-1.5 {{ request()->routeIs('perfil.editar') ? 'bg-brand-primary text-white border-brand-primary shadow-md' : 'border-gray-200 text-brand-dark hover:border-brand-primary hover:text-brand-primary' }}" href="{{ route('perfil.editar') }}">
+                            <svg id="nav-avatar-placeholder" class="w-4 h-4 inline-block {{ auth()->user()->avatar ? 'hidden' : '' }}" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"/>
+                            </svg>
                             @if(auth()->user()->avatar)
-                                <img src="{{ asset('storage/' . auth()->user()->avatar) }}" class="w-5 h-5 rounded-full object-cover inline-block shrink-0 border border-current shadow-sm" alt="Avatar">
-                            @else
-                                <svg class="w-4 h-4 inline-block" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"/>
-                                </svg>
+                                <img src="{{ asset('storage/' . auth()->user()->avatar) }}" class="w-5 h-5 rounded-full object-cover inline-block shrink-0 border border-current shadow-sm" alt="Avatar" onerror="this.style.display='none'; document.getElementById('nav-avatar-placeholder').classList.remove('hidden');">
                             @endif
                             Hola, {{ auth()->user()->nombres }}
                         </a>
@@ -172,7 +192,7 @@
         </div>
     </nav>
 
-    <div class="container mx-auto px-4 md:px-6 mt-8">
+    <div class="container mx-auto px-4 md:px-6 mt-8 relative z-10" style="margin-bottom: 3rem !important; padding-bottom: 5rem !important;">
         @yield('content')
     </div>
 

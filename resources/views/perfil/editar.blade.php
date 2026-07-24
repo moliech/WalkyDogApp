@@ -35,12 +35,12 @@
             <div class="flex flex-col items-center sm:flex-row gap-6 p-5 bg-slate-50 rounded-2xl border border-slate-100 mb-6">
                 <div class="relative group shrink-0">
                     <div class="rounded-full overflow-hidden border-2 border-brand-primary shadow-sm bg-white flex items-center justify-center" style="width: 80px; height: 80px; flex-shrink: 0;">
+                        <svg id="avatar-placeholder" class="w-10 h-10 text-gray-300 {{ auth()->user()->avatar ? 'hidden' : '' }}" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"/>
+                        </svg>
                         @if(auth()->user()->avatar)
-                            <img id="avatar-preview" src="{{ asset('storage/' . auth()->user()->avatar) }}" class="w-full h-full object-cover" alt="Vista previa del avatar">
+                            <img id="avatar-preview" src="{{ asset('storage/' . auth()->user()->avatar) }}" class="w-full h-full object-cover" alt="Vista previa del avatar" onerror="this.classList.add('hidden'); document.getElementById('avatar-placeholder').classList.remove('hidden');">
                         @else
-                            <svg id="avatar-placeholder" class="w-10 h-10 text-gray-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"/>
-                            </svg>
                             <img id="avatar-preview" src="" class="w-full h-full object-cover hidden" alt="Vista previa del avatar">
                         @endif
                     </div>
@@ -139,7 +139,7 @@
                 </div>
                 <div class="flex flex-col mt-4">
                     <label class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Documento de Soporte (Identificación/Cédula PDF)</label>
-                    <input type="file" name="documento_soporte" class="rounded-xl border @error('documento_soporte') border-red-500 @else border-gray-200 @enderror px-4 py-2 text-sm focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 transition duration-200 outline-none text-brand-dark bg-white">
+                    <input type="file" name="documento_soporte" accept=".pdf,application/pdf" class="rounded-xl border @error('documento_soporte') border-red-500 @else border-gray-200 @enderror px-4 py-2 text-sm focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 transition duration-200 outline-none text-brand-dark bg-white">
                     <span class="text-[10px] text-gray-400 mt-1 leading-relaxed">Sube tu cédula o carta de experiencia en formato PDF. El Administrador verificará este documento antes de activar tu perfil.</span>
                     @if(!empty($usuario['documento_soporte']))
                         <div class="mt-2 flex items-center gap-2 bg-slate-50 p-2.5 rounded-xl border border-slate-100/50 w-full sm:w-fit">
@@ -234,7 +234,7 @@
 
                                 <div class="flex flex-col mt-3">
                                     <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Soporte de Identificación o Cédula (PDF)</label>
-                                    <input type="file" name="documento_soporte" required class="rounded-xl border border-gray-200 px-4 py-2 text-sm focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 transition outline-none text-brand-dark bg-white">
+                                    <input type="file" name="documento_soporte" accept=".pdf,application/pdf" required class="rounded-xl border border-gray-200 px-4 py-2 text-sm focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 transition outline-none text-brand-dark bg-white">
                                     <span class="text-[10px] text-gray-400 mt-1 font-semibold leading-relaxed">Sube tu documento de identidad en formato PDF (Max 2MB). El administrador verificará este documento.</span>
                                 </div>
 
@@ -298,7 +298,7 @@
 
                                 <div class="flex flex-col mt-3">
                                     <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Nuevo Soporte de Cédula (PDF)</label>
-                                    <input type="file" name="documento_soporte" required class="rounded-xl border border-gray-200 px-4 py-2 text-sm focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 transition outline-none text-brand-dark bg-white">
+                                    <input type="file" name="documento_soporte" accept=".pdf,application/pdf" required class="rounded-xl border border-gray-200 px-4 py-2 text-sm focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 transition outline-none text-brand-dark bg-white">
                                     <span class="text-[10px] text-gray-400 mt-1 font-semibold leading-relaxed">Sube tu cédula o carta de experiencia corregida en formato PDF (Max 2MB).</span>
                                 </div>
 

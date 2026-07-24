@@ -14,15 +14,46 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-        <body class="font-sans text-brand-dark antialiased bg-brand-bg">
-        <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0">
-            <div class="mb-4">
-                <a href="/" class="text-3xl font-black text-brand-dark no-underline tracking-tight">
-                    WalkyDog
+    <body class="font-sans text-brand-dark antialiased bg-brand-bg relative overflow-x-hidden min-h-screen">
+        <!-- Fondo de Líneas y Ondas Topográficas Vectoriales (Topography Contour Waves) -->
+        <div class="fixed inset-0 pointer-events-none z-0 opacity-80 overflow-hidden">
+            <svg class="w-full h-full text-brand-primary" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" fill="none" stroke="currentColor" stroke-width="1.5">
+                <!-- Ondas de la Esquina Superior Derecha -->
+                <path d="M 900 -100 C 1100 100, 1300 200, 1500 50" stroke="rgba(224, 122, 95, 0.18)" />
+                <path d="M 850 -100 C 1080 120, 1280 240, 1500 100" stroke="rgba(224, 122, 95, 0.16)" />
+                <path d="M 800 -100 C 1050 140, 1250 280, 1500 150" stroke="rgba(224, 122, 95, 0.14)" />
+                <path d="M 750 -100 C 1020 160, 1220 320, 1500 200" stroke="rgba(224, 122, 95, 0.12)" />
+                <path d="M 700 -100 C 990 180, 1190 360, 1500 250" stroke="rgba(224, 122, 95, 0.10)" />
+
+                <!-- Ondas Centrales Fluídas -->
+                <path d="M -100 300 C 300 150, 700 450, 1500 200" stroke="rgba(255, 140, 50, 0.15)" />
+                <path d="M -100 360 C 320 210, 720 510, 1500 260" stroke="rgba(255, 140, 50, 0.13)" />
+                <path d="M -100 420 C 340 270, 740 570, 1500 320" stroke="rgba(255, 140, 50, 0.11)" />
+
+                <!-- Ondas de la Esquina Inferior Izquierda -->
+                <path d="M -100 600 C 200 750, 500 800, 800 1000" stroke="rgba(129, 178, 154, 0.22)" stroke-width="2" />
+                <path d="M -100 660 C 220 800, 520 840, 830 1000" stroke="rgba(129, 178, 154, 0.18)" stroke-width="2" />
+                <path d="M -100 720 C 240 850, 540 880, 860 1000" stroke="rgba(129, 178, 154, 0.14)" />
+                <path d="M -100 780 C 260 900, 560 920, 890 1000" stroke="rgba(129, 178, 154, 0.10)" />
+            </svg>
+        </div>
+
+        <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 relative z-10 px-4">
+            <div class="mb-4 text-center">
+                <a href="/" class="text-3xl font-black text-brand-dark no-underline tracking-tight flex items-center justify-center gap-2">
+                    <svg class="w-8 h-8 text-brand-primary" viewBox="0 0 100 100" fill="currentColor">
+                        <path d="M 50 43 C 35 43, 26 56, 28 70 C 30 82, 42 86, 50 86 C 58 86, 70 82, 72 70 C 74 56, 65 43, 50 43 Z"/>
+                        <circle cx="24" cy="42" r="9"/>
+                        <circle cx="39" cy="24" r="10.5"/>
+                        <circle cx="61" cy="24" r="10.5"/>
+                        <circle cx="76" cy="42" r="9"/>
+                    </svg>
+                    <span>WalkyDog</span>
                 </a>
             </div>
 
-            <div class="w-full sm:max-w-md mt-6 px-8 py-8 bg-white border border-gray-100 shadow-xl shadow-gray-100/40 overflow-hidden sm:rounded-2xl">
+            <!-- Caja de Login Redondeada (sm:rounded-3xl) -->
+            <div class="w-full sm:max-w-md mt-4 px-8 py-8 bg-white border border-gray-100 shadow-2xl shadow-gray-200/60 sm:rounded-3xl relative z-10">
                 {{ $slot }}
             </div>
         </div>
